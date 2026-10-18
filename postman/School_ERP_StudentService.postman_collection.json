@@ -1,0 +1,355 @@
+{
+  "info": {
+    "_postman_id": "c1f7a4d2-3b2e-4b68-8a71-6c3f59e67123",
+    "name": "School_ERP_StudentService",
+    "description": "Postman Collection for School ERP Module 03 - Student Information System (SIS) & Lifecycle Management (US-03000 to US-03009)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8084",
+      "type": "string"
+    },
+    {
+      "key": "bearerToken",
+      "value": "YOUR_JWT_TOKEN",
+      "type": "string"
+    },
+    {
+      "key": "studentId",
+      "value": "00000000-0000-0000-0000-000000000001",
+      "type": "string"
+    },
+    {
+      "key": "studentUid",
+      "value": "STU2026000001",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "US-03000: Enrollment & Permanent UID",
+      "item": [
+        {
+          "name": "Enroll New Student (Generate Permanent UID)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenantId\": \"DPS-DELHI\",\n  \"branchId\": \"MAIN-01\",\n  \"firstName\": \"Aarav\",\n  \"lastName\": \"Sharma\",\n  \"dateOfBirth\": \"2015-05-14\",\n  \"gender\": \"MALE\",\n  \"bloodGroup\": \"O+\",\n  \"medicalAlerts\": \"Peanut allergy\",\n  \"emergencyContactPhone\": \"+919876543210\",\n  \"guardianName\": \"Rajesh Sharma\",\n  \"guardianRelationship\": \"Father\",\n  \"guardianPhone\": \"+919876543210\",\n  \"guardianEmail\": \"rajesh.sharma@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "students"]
+            }
+          }
+        },
+        {
+          "name": "Get Student by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "students", "{{studentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Student by Permanent UID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/uid/{{studentUid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "students", "uid", "{{studentUid}}"]
+            }
+          }
+        },
+        {
+          "name": "List Students by Tenant and Branch",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students?tenantId=DPS-DELHI&branchId=MAIN-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "students"],
+              "query": [
+                { "key": "tenantId", "value": "DPS-DELHI" },
+                { "key": "branchId", "value": "MAIN-01" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03001: Medical Alerts & Emergency Contacts",
+      "item": [
+        {
+          "name": "Update Medical Alerts & Emergency Contact",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bloodGroup\": \"B+\",\n  \"medicalAlerts\": \"Asthma inhaler required before physical exercise\",\n  \"emergencyContactPhone\": \"+919876543999\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/medical",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "students", "{{studentId}}", "medical"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03002: Sibling Profile Linking",
+      "item": [
+        {
+          "name": "Link Sibling Under Consolidated Parent Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parentAccountId\": \"PARENT-ACC-8899\",\n  \"siblingStudentId\": \"00000000-0000-0000-0000-000000000002\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/siblings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "students", "{{studentId}}", "siblings"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03003: Section & House Allocation",
+      "item": [
+        {
+          "name": "Allocate Student to Section and House",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"gradeId\": \"11111111-1111-1111-1111-111111111111\",\n  \"sectionId\": \"22222222-2222-2222-2222-222222222222\",\n  \"houseId\": \"33333333-3333-3333-3333-333333333333\",\n  \"rollNumber\": 15\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/allocation",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "students", "{{studentId}}", "allocation"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03004: Barcoded & QR ID Cards",
+      "item": [
+        {
+          "name": "Generate Barcoded ID Card with QR Verification",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/id-card",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "students", "{{studentId}}", "id-card"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03005: Batch Promotion Engine",
+      "item": [
+        {
+          "name": "Execute Annual Batch Promotion",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentAcademicYearId\": \"10000000-0000-0000-0000-000000000001\",\n  \"nextAcademicYearId\": \"20000000-0000-0000-0000-000000000002\",\n  \"fromGradeId\": \"11111111-1111-1111-1111-111111111111\",\n  \"toGradeId\": \"22222222-2222-2222-2222-222222222222\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/academic/batch-promotion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "academic", "batch-promotion"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03006: Dual-Signoff Transfer Certificates",
+      "item": [
+        {
+          "name": "Issue Dual-Signoff Transfer Certificate (TC)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reasonForLeaving\": \"Parent job relocation to Bangalore\",\n  \"conductRemarks\": \"Exemplary conduct and active sports participation\",\n  \"secondSignOffUserId\": \"principal@kvs.local\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/certificates/transfer",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "students", "{{studentId}}", "certificates", "transfer"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03007: Bonafide & Character Certificates",
+      "item": [
+        {
+          "name": "Issue Bonafide Certificate with QR Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"certificateType\": \"BONAFIDE\",\n  \"purpose\": \"Passport Application\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/certificates/bonafide",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "students", "{{studentId}}", "certificates", "bonafide"]
+            }
+          }
+        },
+        {
+          "name": "List Certificates Issued for Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/certificates",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "students", "{{studentId}}", "certificates"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03008: Disciplinary Incidents & Counseling",
+      "item": [
+        {
+          "name": "Record Disciplinary Incident & Counseling Intervention",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"incidentDate\": \"2026-09-10\",\n  \"severity\": \"MODERATE\",\n  \"incidentCategory\": \"Repeated classroom disruption\",\n  \"description\": \"Disrupted physics lab session twice\",\n  \"actionTaken\": \"Written reflection submitted and parent counseling scheduled\",\n  \"counselingNotes\": \"Student advised on focus and team collaboration\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/disciplinary",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "students", "{{studentId}}", "disciplinary"]
+            }
+          }
+        },
+        {
+          "name": "List Disciplinary Incidents for Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/disciplinary",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "students", "{{studentId}}", "disciplinary"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03009: Permanent Alumni Registry",
+      "item": [
+        {
+          "name": "Archive Graduating Student into Alumni Registry",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"{{studentId}}\",\n  \"graduationYear\": 2026,\n  \"finalGradePassed\": \"Grade 12 - Science\",\n  \"alumniEmail\": \"aarav.alumni@example.com\",\n  \"alumniPhone\": \"+919876543210\",\n  \"higherEducationInstitution\": \"Indian Institute of Technology, Bombay\",\n  \"currentOccupation\": \"Undergraduate Student - Computer Science\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/alumni/archive",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "alumni", "archive"]
+            }
+          }
+        },
+        {
+          "name": "Get Alumni Profile by Student UID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/alumni/{{studentUid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "alumni", "{{studentUid}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
