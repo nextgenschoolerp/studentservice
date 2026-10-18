@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ import java.util.UUID;
         @Index(name = "idx_student_parent_account", columnList = "parent_account_id")
 })
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -88,4 +90,17 @@ public class StudentMaster extends BaseAuditEntity {
 
     @Column(name = "profile_photo_url", length = 255)
     private String profilePhotoUrl;
+
+    @Column(name = "residential_address", length = 500)
+    private String residentialAddress;
+
+    @Column(name = "transport_route_id", length = 100)
+    private String transportRouteId;
+
+    @Column(name = "is_on_hold")
+    @Builder.Default
+    private Boolean isOnHold = false;
+
+    @Column(name = "active_hold_reason", length = 255)
+    private String activeHoldReason;
 }

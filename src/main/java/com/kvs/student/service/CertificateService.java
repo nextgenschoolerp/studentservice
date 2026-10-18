@@ -35,14 +35,16 @@ public class CertificateService {
     @Autowired
     private StudentAuditService auditService;
 
+    @Autowired
+    private TenantAccessGuard tenantGuard;
+
     /**
      * US-03006: Generate official transfer certificates (TC) with dual administrative sign-off
      */
     @Transactional
     public CertificateResponse issueTransferCertificate(UUID studentId, IssueTransferCertificateRequest request) {
         log.info("Issuing Transfer Certificate for student: {}", studentId);
-        StudentMaster student = studentRepository.findByStudentId(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("StudentMaster", "studentId", studentId));
+        StudentMaster student = findStudent(studentId);
 
         String firstAuthorizer = SecurityUtils.getCurrentUserEmail().orElse("registrar");
         if (request.getSecondSignOffUserId() == null || request.getSecondSignOffUserId().isBlank()) {
@@ -52,7 +54,7 @@ public class CertificateService {
             throw new BadRequestException("Dual administrative sign-off requires two distinct authorizers");
         }
 
-        String certNumber = UidGenerator.generateCertificateNumber("TC");
+        String certNumber = nextCertificateNumber("TC");
         String qrToken = "TC-" + UUID.randomUUID();
 
         CertificateIssued certificate = CertificateIssued.builder()
@@ -84,12 +86,11 @@ public class CertificateService {
     @Transactional
     public CertificateResponse issueBonafideCertificate(UUID studentId, IssueBonafideCertificateRequest request) {
         log.info("Issuing certificate {} for student: {}", request.getCertificateType(), studentId);
-        StudentMaster student = studentRepository.findByStudentId(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("StudentMaster", "studentId", studentId));
+        StudentMaster student = findStudent(studentId);
 
         String authorizer = SecurityUtils.getCurrentUserEmail().orElse("registrar");
         String prefix = request.getCertificateType() == CertificateType.CHARACTER ? "CHAR" : "BON";
-        String certNumber = UidGenerator.generateCertificateNumber(prefix);
+        String certNumber = nextCertificateNumber(prefix);
         String qrToken = prefix + "-" + UUID.randomUUID();
 
         CertificateIssued certificate = CertificateIssued.builder()
@@ -113,12 +114,31 @@ public class CertificateService {
 
     @Transactional(readOnly = true)
     public List<CertificateResponse> listCertificates(UUID studentId) {
-        StudentMaster student = studentRepository.findByStudentId(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("StudentMaster", "studentId", studentId));
+        StudentMaster student = findStudent(studentId);
 
         return certificateRepository.findByStudentId(studentId).stream()
                 .map(c -> mapToResponse(c, student))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * The in-memory counter restarts on every service start, so numbers already issued before a restart are skipped
+     * rather than failing on the unique certificate_number column.
+     */
+    private String nextCertificateNumber(String prefix) {
+        String certNumber = UidGenerator.generateCertificateNumber(prefix);
+        while (certificateRepository.existsByCertificateNumber(certNumber)) {
+            certNumber = UidGenerator.generateCertificateNumber(prefix);
+        }
+        return certNumber;
+    }
+
+    /** Loads a student of the caller's tenant; another tenant's student is reported as not found. */
+    private StudentMaster findStudent(UUID studentId) {
+        StudentMaster student = studentRepository.findByStudentId(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("StudentMaster", "studentId", studentId));
+        tenantGuard.requireTenantRecord(student.getTenantId(), "StudentMaster", "studentId", studentId);
+        return student;
     }
 
     private CertificateResponse mapToResponse(CertificateIssued cert, StudentMaster student) {

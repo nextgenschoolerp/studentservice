@@ -2,13 +2,13 @@
   "info": {
     "_postman_id": "c1f7a4d2-3b2e-4b68-8a71-6c3f59e67123",
     "name": "School_ERP_StudentService",
-    "description": "Postman Collection for School ERP Module 03 - Student Information System (SIS) & Lifecycle Management (US-03000 to US-03009)",
+    "description": "Postman Collection for School ERP Module 03 - Student Information System (SIS) & Lifecycle Management (US-03000 to US-03100)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:8084",
+      "value": "http://localhost:8084/studentservice",
       "type": "string"
     },
     {
@@ -25,6 +25,76 @@
       "key": "studentUid",
       "value": "STU2026000001",
       "type": "string"
+    },
+    {
+      "key": "registrarToken",
+      "value": "YOUR_REGISTRAR_JWT_TOKEN",
+      "type": "string"
+    },
+    {
+      "key": "clerkToken",
+      "value": "YOUR_CLERK_JWT_TOKEN",
+      "type": "string"
+    },
+    {
+      "key": "teacherToken",
+      "value": "YOUR_TEACHER_JWT_TOKEN",
+      "type": "string"
+    },
+    {
+      "key": "nurseToken",
+      "value": "YOUR_NURSE_JWT_TOKEN",
+      "type": "string"
+    },
+    {
+      "key": "houseMasterToken",
+      "value": "YOUR_HOUSE_MASTER_JWT_TOKEN",
+      "type": "string"
+    },
+    {
+      "key": "alumniCoordinatorToken",
+      "value": "YOUR_ALUMNI_COORDINATOR_JWT_TOKEN",
+      "type": "string"
+    },
+    {
+      "key": "academicHeadToken",
+      "value": "YOUR_ACADEMIC_HEAD_JWT_TOKEN",
+      "type": "string"
+    },
+    {
+      "key": "principalToken",
+      "value": "YOUR_PRINCIPAL_JWT_TOKEN",
+      "type": "string"
+    },
+    {
+      "key": "sectionId",
+      "value": "00000000-0000-0000-0000-000000000002",
+      "type": "string"
+    },
+    {
+      "key": "gradeId",
+      "value": "00000000-0000-0000-0000-000000000003",
+      "type": "string"
+    },
+    {
+      "key": "houseId",
+      "value": "00000000-0000-0000-0000-000000000004",
+      "type": "string"
+    },
+    {
+      "key": "holdId",
+      "value": "00000000-0000-0000-0000-000000000005",
+      "type": "string"
+    },
+    {
+      "key": "transferId",
+      "value": "00000000-0000-0000-0000-000000000006",
+      "type": "string"
+    },
+    {
+      "key": "verificationRequestId",
+      "value": "00000000-0000-0000-0000-000000000007",
+      "type": "string"
     }
   ],
   "item": [
@@ -36,8 +106,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
-              { "key": "Content-Type", "value": "application/json", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -45,8 +123,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/students",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "students"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ]
             }
           }
         },
@@ -55,12 +139,23 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/students/{{studentId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "students", "{{studentId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}"
+              ]
             }
           }
         },
@@ -69,12 +164,24 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/students/uid/{{studentUid}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "students", "uid", "{{studentUid}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "uid",
+                "{{studentUid}}"
+              ]
             }
           }
         },
@@ -83,15 +190,31 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/students?tenantId=DPS-DELHI&branchId=MAIN-01",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "students"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ],
               "query": [
-                { "key": "tenantId", "value": "DPS-DELHI" },
-                { "key": "branchId", "value": "MAIN-01" }
+                {
+                  "key": "tenantId",
+                  "value": "DPS-DELHI"
+                },
+                {
+                  "key": "branchId",
+                  "value": "MAIN-01"
+                }
               ]
             }
           }
@@ -106,8 +229,16 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
-              { "key": "Content-Type", "value": "application/json", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -115,8 +246,16 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/medical",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "students", "{{studentId}}", "medical"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "medical"
+              ]
             }
           }
         }
@@ -130,8 +269,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
-              { "key": "Content-Type", "value": "application/json", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -139,8 +286,16 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/siblings",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "students", "{{studentId}}", "siblings"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "siblings"
+              ]
             }
           }
         }
@@ -154,8 +309,16 @@
           "request": {
             "method": "PUT",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
-              { "key": "Content-Type", "value": "application/json", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -163,8 +326,16 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/allocation",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "students", "{{studentId}}", "allocation"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "allocation"
+              ]
             }
           }
         }
@@ -178,12 +349,24 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/id-card",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "students", "{{studentId}}", "id-card"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "id-card"
+              ]
             }
           }
         }
@@ -197,8 +380,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
-              { "key": "Content-Type", "value": "application/json", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -206,8 +397,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/academic/batch-promotion",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "academic", "batch-promotion"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "academic",
+                "batch-promotion"
+              ]
             }
           }
         }
@@ -221,8 +419,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
-              { "key": "Content-Type", "value": "application/json", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -230,8 +436,17 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/certificates/transfer",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "students", "{{studentId}}", "certificates", "transfer"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "certificates",
+                "transfer"
+              ]
             }
           }
         }
@@ -245,8 +460,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
-              { "key": "Content-Type", "value": "application/json", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -254,8 +477,17 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/certificates/bonafide",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "students", "{{studentId}}", "certificates", "bonafide"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "certificates",
+                "bonafide"
+              ]
             }
           }
         },
@@ -264,12 +496,24 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/certificates",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "students", "{{studentId}}", "certificates"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "certificates"
+              ]
             }
           }
         }
@@ -283,8 +527,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
-              { "key": "Content-Type", "value": "application/json", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -292,8 +544,16 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/disciplinary",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "students", "{{studentId}}", "disciplinary"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "disciplinary"
+              ]
             }
           }
         },
@@ -302,12 +562,24 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/disciplinary",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "students", "{{studentId}}", "disciplinary"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "disciplinary"
+              ]
             }
           }
         }
@@ -321,8 +593,16 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" },
-              { "key": "Content-Type", "value": "application/json", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -330,8 +610,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/alumni/archive",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "alumni", "archive"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "alumni",
+                "archive"
+              ]
             }
           }
         },
@@ -340,12 +627,3882 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{bearerToken}}", "type": "text" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearerToken}}",
+                "type": "text"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/alumni/{{studentUid}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "alumni", "{{studentUid}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "alumni",
+                "{{studentUid}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03010: Multi-Criteria Demographic Filter",
+      "item": [
+        {
+          "name": "Search Students by Filter (200 OK)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/search?transportRouteId=ROUTE-12",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "transportRouteId",
+                  "value": "ROUTE-12"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03011: Bulk Contact & Address Update",
+      "item": [
+        {
+          "name": "Bulk Update Student Contacts (200 OK)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clerkToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"studentId\": \"{{studentId}}\",\n      \"residentialAddress\": \"Flat 402, Sunshine Apartments, Delhi\",\n      \"emergencyContactPhone\": \"+919876543210\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/bulk-contact-update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "bulk-contact-update"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03012: Extracurricular Credits & House Points",
+      "item": [
+        {
+          "name": "Log Activity Participation Credit (201 Created)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{houseMasterToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activityName\": \"Inter-School Debate Championship\",\n  \"activityCategory\": \"Literary\",\n  \"pointsAwarded\": 15,\n  \"eventDate\": \"2026-10-15\",\n  \"remarks\": \"First Runner-up\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "activities"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get House Total Points (200 OK)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{houseMasterToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/academic/houses/{{houseId}}/points",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "academic",
+                "houses",
+                "{{houseId}}",
+                "points"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03013: Alumni Credential Verification",
+      "item": [
+        {
+          "name": "Submit Credential Verification Request (201 Created)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumniCoordinatorToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentUid\": \"{{studentUid}}\",\n  \"requestorName\": \"Infosys Background Verification Team\",\n  \"requestorOrganization\": \"Infosys Limited\",\n  \"credentialType\": \"TRANSFER_CERTIFICATE\",\n  \"remarks\": \"Employment verification\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/alumni/credential-verifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "alumni",
+                "credential-verifications"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Review Credential Verification (200 OK)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrarToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"VERIFIED\",\n  \"verificationRemarks\": \"Ledger records match graduation archives\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/alumni/credential-verifications/{{verificationRequestId}}/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "alumni",
+                "credential-verifications",
+                "{{verificationRequestId}}",
+                "verify"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03014: Student Photo Management & Export",
+      "item": [
+        {
+          "name": "Update Student Photo (200 OK)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{academicHeadToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"photoUrl\": \"https://storage.kvs.local/photos/stu2026000001.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/photo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "photo"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Export Photo Directory (200 OK)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{academicHeadToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/export-photo-directory?gradeId={{gradeId}}&sectionId={{sectionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "export-photo-directory"
+              ],
+              "query": [
+                {
+                  "key": "gradeId",
+                  "value": "{{gradeId}}"
+                },
+                {
+                  "key": "sectionId",
+                  "value": "{{sectionId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03015: Administrative Holds",
+      "item": [
+        {
+          "name": "Place Administrative Hold (201 Created)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{principalToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"holdType\": \"FEE_DEFAULT\",\n  \"reason\": \"Term 2 fee default exceeding 45 days\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/holds",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "holds"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Release Administrative Hold (200 OK)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{principalToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"releaseRemarks\": \"Fees cleared in full via online payment receipt REC-9921\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/holds/{{holdId}}/release",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "holds",
+                "{{holdId}}",
+                "release"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03016: Periodic Health Metrics Tracking",
+      "item": [
+        {
+          "name": "Record Health Metrics (201 Created)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{nurseToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"checkupDate\": \"2026-10-18\",\n  \"heightCm\": 142.5,\n  \"weightKg\": 36.0,\n  \"visionLeft\": \"6/6\",\n  \"visionRight\": \"6/6\",\n  \"healthNotes\": \"Vitals normal, BMI 17.73\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/health-metrics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "health-metrics"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03017: Language Preferences & Electives",
+      "item": [
+        {
+          "name": "Record Elective Selection (201 Created)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clerkToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"academicYearId\": \"{{gradeId}}\",\n  \"firstLanguage\": \"English\",\n  \"secondLanguage\": \"Hindi\",\n  \"thirdLanguage\": \"Sanskrit\",\n  \"electiveSubjectCode\": \"CS-101\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/electives",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "electives"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03018: Class Enrollment Roll Lists",
+      "item": [
+        {
+          "name": "Generate Section Roll List (200 OK)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/academic/sections/{{sectionId}}/roll-list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "academic",
+                "sections",
+                "{{sectionId}}",
+                "roll-list"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03019: Section Transfer Approval Workflow",
+      "item": [
+        {
+          "name": "Propose Section Transfer (201 Created)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetSectionId\": \"{{sectionId}}\",\n  \"reason\": \"Balancing section student strengths and language lab schedules\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/section-transfers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "section-transfers"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Review Section Transfer (200 OK)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{academicHeadToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\",\n  \"remarks\": \"Approved for section strength balance\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/section-transfers/{{transferId}}/review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "section-transfers",
+                "{{transferId}}",
+                "review"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03020: Permanent Student UID Generation (Scenario 2, House Master)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - House Master (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{houseMasterToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03020-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03021: Real-Time Medical Alerts & Emergency (Scenario 2, Alumni Coordinator)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Alumni Coordinator (not granted: expect 403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumniCoordinatorToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03021-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/medical",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "medical"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03022: Multi-Sibling Linking (Scenario 2, Academic Head)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Academic Head (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{academicHeadToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03022-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/siblings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "siblings"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03023: Academic Section & House Allocation (Scenario 2, School Principal)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Principal (not granted: expect 403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{principalToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03023-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/allocation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "allocation"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03024: Barcoded ID Card Generation (Scenario 2, School Registrar)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Registrar (granted: expect 2xx)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrarToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03024-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/id-card",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "id-card"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03025: Annual Batch Promotions (Scenario 2, Office Clerk)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Office Clerk (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clerkToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03025-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/academic/batch-promotion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "academic",
+                "batch-promotion"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03026: Dual Sign-off Transfer Certificates (Scenario 2, Class Teacher)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Class Teacher (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03026-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/certificates/transfer",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "certificates",
+                "transfer"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03027: Bonafide & Character Certificates (Scenario 2, School Nurse)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Nurse (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{nurseToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03027-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/certificates/bonafide",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "certificates",
+                "bonafide"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03028: Disciplinary Incidents & Counseling (Scenario 2, House Master)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - House Master (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{houseMasterToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03028-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/disciplinary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "disciplinary"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03029: Permanent Alumni Archiving (Scenario 2, Alumni Coordinator)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Alumni Coordinator (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumniCoordinatorToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03029-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/alumni/archive",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "alumni",
+                "archive"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03030: Demographic Multi-Criteria Filter (Scenario 2, Academic Head)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Academic Head (granted: expect 2xx)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{academicHeadToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03030-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/search?transportRouteId=ROUTE-12",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "search"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03031: Bulk Contact Update (Scenario 2, School Principal)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Principal (granted: expect 2xx)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{principalToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03031-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/bulk-contact-update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "bulk-contact-update"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03032: Extracurricular Participation Credits (Scenario 2, School Registrar)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Registrar (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrarToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03032-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "activities"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03033: Alumni Credential Verification (Scenario 2, Office Clerk)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Office Clerk (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clerkToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03033-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/alumni/credential-verifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "alumni",
+                "credential-verifications"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03034: Student Photo Management (Scenario 2, Class Teacher)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Class Teacher (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03034-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/photo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "photo"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03035: Administrative Hold Management (Scenario 2, School Nurse)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Nurse (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{nurseToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03035-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/holds",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "holds"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03036: Periodic Health Metrics Tracking (Scenario 2, House Master)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - House Master (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{houseMasterToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03036-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/health-metrics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "health-metrics"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03037: Language Preferences & Electives (Scenario 2, Alumni Coordinator)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Alumni Coordinator (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumniCoordinatorToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03037-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/electives",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "electives"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03038: Class Enrollment Roll Lists (Scenario 2, Academic Head)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Academic Head (granted: expect 2xx)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{academicHeadToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03038-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/academic/sections/{{sectionId}}/roll-list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "academic",
+                "sections",
+                "{{sectionId}}",
+                "roll-list"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03039: Section Transfer Workflow (Scenario 2, School Principal)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Principal (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{principalToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03039-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/section-transfers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "section-transfers"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03040: Permanent Student UID Generation (Scenario 3, School Registrar)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Registrar (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrarToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03040-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03041: Real-Time Medical Alerts & Emergency (Scenario 3, Office Clerk)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Office Clerk (not granted: expect 403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clerkToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03041-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/medical",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "medical"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03042: Multi-Sibling Linking (Scenario 3, Class Teacher)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Class Teacher (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03042-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/siblings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "siblings"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03043: Academic Section & House Allocation (Scenario 3, School Nurse)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Nurse (not granted: expect 403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{nurseToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03043-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/allocation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "allocation"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03044: Barcoded ID Card Generation (Scenario 3, House Master)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - House Master (not granted: expect 403)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{houseMasterToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03044-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/id-card",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "id-card"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03045: Annual Batch Promotions (Scenario 3, Alumni Coordinator)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Alumni Coordinator (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumniCoordinatorToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03045-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/academic/batch-promotion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "academic",
+                "batch-promotion"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03046: Dual Sign-off Transfer Certificates (Scenario 3, Academic Head)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Academic Head (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{academicHeadToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03046-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/certificates/transfer",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "certificates",
+                "transfer"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03047: Bonafide & Character Certificates (Scenario 3, School Principal)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Principal (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{principalToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03047-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/certificates/bonafide",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "certificates",
+                "bonafide"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03048: Disciplinary Incidents & Counseling (Scenario 3, School Registrar)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Registrar (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrarToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03048-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/disciplinary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "disciplinary"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03049: Permanent Alumni Archiving (Scenario 3, Office Clerk)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Office Clerk (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clerkToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03049-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/alumni/archive",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "alumni",
+                "archive"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03050: Demographic Multi-Criteria Filter (Scenario 3, Class Teacher)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Class Teacher (granted: expect 2xx)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03050-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/search?transportRouteId=ROUTE-12",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "search"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03051: Bulk Contact Update (Scenario 3, School Nurse)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Nurse (granted: expect 2xx)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{nurseToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03051-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/bulk-contact-update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "bulk-contact-update"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03052: Extracurricular Participation Credits (Scenario 3, House Master)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - House Master (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{houseMasterToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03052-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "activities"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03053: Alumni Credential Verification (Scenario 3, Alumni Coordinator)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Alumni Coordinator (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumniCoordinatorToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03053-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/alumni/credential-verifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "alumni",
+                "credential-verifications"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03054: Student Photo Management (Scenario 3, Academic Head)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Academic Head (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{academicHeadToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03054-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/photo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "photo"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03055: Administrative Hold Management (Scenario 3, School Principal)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Principal (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{principalToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03055-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/holds",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "holds"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03056: Periodic Health Metrics Tracking (Scenario 3, School Registrar)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Registrar (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrarToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03056-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/health-metrics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "health-metrics"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03057: Language Preferences & Electives (Scenario 3, Office Clerk)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Office Clerk (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clerkToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03057-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/electives",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "electives"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03058: Class Enrollment Roll Lists (Scenario 3, Class Teacher)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Class Teacher (granted: expect 2xx)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03058-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/academic/sections/{{sectionId}}/roll-list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "academic",
+                "sections",
+                "{{sectionId}}",
+                "roll-list"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03059: Section Transfer Workflow (Scenario 3, School Nurse)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Nurse (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{nurseToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03059-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/section-transfers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "section-transfers"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03060: Permanent Student UID Generation (Scenario 4, House Master)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - House Master (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{houseMasterToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03060-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03061: Real-Time Medical Alerts & Emergency (Scenario 4, Alumni Coordinator)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Alumni Coordinator (not granted: expect 403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumniCoordinatorToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03061-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/medical",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "medical"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03062: Multi-Sibling Linking (Scenario 4, Academic Head)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Academic Head (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{academicHeadToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03062-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/siblings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "siblings"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03063: Academic Section & House Allocation (Scenario 4, School Principal)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Principal (not granted: expect 403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{principalToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03063-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/allocation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "allocation"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03064: Barcoded ID Card Generation (Scenario 4, School Registrar)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Registrar (granted: expect 2xx)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrarToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03064-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/id-card",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "id-card"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03065: Annual Batch Promotions (Scenario 4, Office Clerk)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Office Clerk (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clerkToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03065-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/academic/batch-promotion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "academic",
+                "batch-promotion"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03066: Dual Sign-off Transfer Certificates (Scenario 4, Class Teacher)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Class Teacher (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03066-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/certificates/transfer",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "certificates",
+                "transfer"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03067: Bonafide & Character Certificates (Scenario 4, School Nurse)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Nurse (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{nurseToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03067-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/certificates/bonafide",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "certificates",
+                "bonafide"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03068: Disciplinary Incidents & Counseling (Scenario 4, House Master)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - House Master (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{houseMasterToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03068-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/disciplinary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "disciplinary"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03069: Permanent Alumni Archiving (Scenario 4, Alumni Coordinator)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Alumni Coordinator (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumniCoordinatorToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03069-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/alumni/archive",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "alumni",
+                "archive"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03070: Demographic Multi-Criteria Filter (Scenario 4, Academic Head)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Academic Head (granted: expect 2xx)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{academicHeadToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03070-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/search?transportRouteId=ROUTE-12",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "search"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03071: Bulk Contact Update (Scenario 4, School Principal)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Principal (granted: expect 2xx)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{principalToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03071-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/bulk-contact-update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "bulk-contact-update"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03072: Extracurricular Participation Credits (Scenario 4, School Registrar)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Registrar (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrarToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03072-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "activities"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03073: Alumni Credential Verification (Scenario 4, Office Clerk)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Office Clerk (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clerkToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03073-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/alumni/credential-verifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "alumni",
+                "credential-verifications"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03074: Student Photo Management (Scenario 4, Class Teacher)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Class Teacher (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03074-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/photo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "photo"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03075: Administrative Hold Management (Scenario 4, School Nurse)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Nurse (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{nurseToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03075-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/holds",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "holds"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03076: Periodic Health Metrics Tracking (Scenario 4, House Master)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - House Master (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{houseMasterToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03076-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/health-metrics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "health-metrics"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03077: Language Preferences & Electives (Scenario 4, Alumni Coordinator)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Alumni Coordinator (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumniCoordinatorToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03077-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/electives",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "electives"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03078: Class Enrollment Roll Lists (Scenario 4, Academic Head)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Academic Head (granted: expect 2xx)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{academicHeadToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03078-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/academic/sections/{{sectionId}}/roll-list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "academic",
+                "sections",
+                "{{sectionId}}",
+                "roll-list"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03079: Section Transfer Workflow (Scenario 4, School Principal)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Principal (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{principalToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03079-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/section-transfers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "section-transfers"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03080: Permanent Student UID Generation (Scenario 5, School Registrar)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Registrar (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrarToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03080-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03081: Real-Time Medical Alerts & Emergency (Scenario 5, Office Clerk)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Office Clerk (not granted: expect 403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clerkToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03081-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/medical",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "medical"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03082: Multi-Sibling Linking (Scenario 5, Class Teacher)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Class Teacher (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03082-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/siblings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "siblings"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03083: Academic Section & House Allocation (Scenario 5, School Nurse)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Nurse (not granted: expect 403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{nurseToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03083-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/allocation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "allocation"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03084: Barcoded ID Card Generation (Scenario 5, House Master)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - House Master (not granted: expect 403)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{houseMasterToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03084-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/id-card",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "id-card"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03085: Annual Batch Promotions (Scenario 5, Alumni Coordinator)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Alumni Coordinator (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumniCoordinatorToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03085-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/academic/batch-promotion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "academic",
+                "batch-promotion"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03086: Dual Sign-off Transfer Certificates (Scenario 5, Academic Head)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Academic Head (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{academicHeadToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03086-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/certificates/transfer",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "certificates",
+                "transfer"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03087: Bonafide & Character Certificates (Scenario 5, School Principal)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Principal (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{principalToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03087-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/certificates/bonafide",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "certificates",
+                "bonafide"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03088: Disciplinary Incidents & Counseling (Scenario 5, School Registrar)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Registrar (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrarToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03088-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/disciplinary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "disciplinary"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03089: Permanent Alumni Archiving (Scenario 5, Office Clerk)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Office Clerk (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clerkToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03089-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/alumni/archive",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "alumni",
+                "archive"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03090: Demographic Multi-Criteria Filter (Scenario 5, Class Teacher)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Class Teacher (granted: expect 2xx)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03090-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/search?transportRouteId=ROUTE-12",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "search"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03091: Bulk Contact Update (Scenario 5, School Nurse)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Nurse (granted: expect 2xx)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{nurseToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03091-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/bulk-contact-update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "bulk-contact-update"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03092: Extracurricular Participation Credits (Scenario 5, House Master)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - House Master (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{houseMasterToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03092-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "activities"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03093: Alumni Credential Verification (Scenario 5, Alumni Coordinator)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Alumni Coordinator (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{alumniCoordinatorToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03093-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/alumni/credential-verifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "alumni",
+                "credential-verifications"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03094: Student Photo Management (Scenario 5, Academic Head)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Academic Head (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{academicHeadToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03094-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/photo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "photo"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03095: Administrative Hold Management (Scenario 5, School Principal)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Principal (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{principalToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03095-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/holds",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "holds"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03096: Periodic Health Metrics Tracking (Scenario 5, School Registrar)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Registrar (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrarToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03096-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/health-metrics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "health-metrics"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03097: Language Preferences & Electives (Scenario 5, Office Clerk)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Office Clerk (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clerkToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03097-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/electives",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "electives"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03098: Class Enrollment Roll Lists (Scenario 5, Class Teacher)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - Class Teacher (granted: expect 2xx)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03098-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/academic/sections/{{sectionId}}/roll-list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "academic",
+                "sections",
+                "{{sectionId}}",
+                "roll-list"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03099: Section Transfer Workflow (Scenario 5, School Nurse)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - School Nurse (granted: expect 2xx)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{nurseToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03099-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}/section-transfers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}",
+                "section-transfers"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "US-03100: Permanent Student UID Generation (Scenario 6, House Master)",
+      "item": [
+        {
+          "name": "Actor Authorization Probe - House Master (not granted: expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{houseMasterToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Trace-Id",
+                "value": "postman-us-03100-probe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ]
             }
           }
         }

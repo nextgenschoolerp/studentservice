@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -38,6 +39,26 @@ public class StudentResponse {
     private String parentAccountId;
     private String idCardBarcode;
     private String idCardQrCode;
+    private String profilePhotoUrl;
+    private String residentialAddress;
+    private String transportRouteId;
+    private Boolean isOnHold;
+    private String activeHoldReason;
     private Instant createdAt;
     private Instant updatedAt;
+    /** Guardians and emergency contacts, primary contact first. */
+    private List<Guardian> guardians;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Guardian {
+        private UUID guardianId;
+        private String fullName;
+        private String relationship;
+        private String mobileNumber;
+        private String email;
+        private Boolean primaryContact;
+    }
 }

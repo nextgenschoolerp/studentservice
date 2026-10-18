@@ -132,6 +132,9 @@ public class AcademicHierarchyController {
         return ResponseEntity.ok(ApiResponse.success(houses));
     }
 
+    @Autowired
+    private com.kvs.student.service.StudentActivityService activityService;
+
     /**
      * US-03005: Execute annual batch promotions to advance eligible students to the next grade
      */
@@ -142,5 +145,29 @@ public class AcademicHierarchyController {
         log.info("Request to execute batch promotion from grade {} to grade {}", request.getFromGradeId(), request.getToGradeId());
         BatchPromotionResponse response = studentService.batchPromoteStudents(request);
         return ResponseEntity.ok(ApiResponse.success("Batch promotion executed successfully", response));
+    }
+
+    /**
+     * US-03018: Generate class enrollment roll lists for daily attendance verification
+     */
+    @GetMapping("/sections/{sectionId}/roll-list")
+    @PreAuthorize("hasAnyRole('CLASS_TEACHER', 'ACADEMIC_HEAD', 'REGISTRAR', 'SUPER_ADMIN', 'OFFICE_CLERK', 'SCHOOL_PRINCIPAL') or hasAnyAuthority('ROLE_CLASS_TEACHER', 'ROLE_ACADEMIC_HEAD', 'ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN', 'ROLE_OFFICE_CLERK', 'ROLE_SCHOOL_PRINCIPAL')")
+    public ResponseEntity<ApiResponse<ClassRollListResponse>> getSectionRollList(
+            @PathVariable("sectionId") UUID sectionId) {
+        log.info("Request to generate class roll list for section: {}", sectionId);
+        ClassRollListResponse response = studentService.getSectionRollList(sectionId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * US-03012: Extracurricular and house points aggregation
+     */
+    @GetMapping("/houses/{houseId}/points")
+    @PreAuthorize("hasAnyRole('HOUSE_MASTER', 'CLASS_TEACHER', 'ACADEMIC_HEAD', 'REGISTRAR', 'SUPER_ADMIN', 'SCHOOL_PRINCIPAL') or hasAnyAuthority('ROLE_HOUSE_MASTER', 'ROLE_CLASS_TEACHER', 'ROLE_ACADEMIC_HEAD', 'ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN', 'ROLE_SCHOOL_PRINCIPAL')")
+    public ResponseEntity<ApiResponse<Integer>> getHousePoints(
+            @PathVariable("houseId") UUID houseId) {
+        log.info("Request to fetch total points for house: {}", houseId);
+        Integer points = activityService.getHouseTotalPoints(houseId);
+        return ResponseEntity.ok(ApiResponse.success(points));
     }
 }

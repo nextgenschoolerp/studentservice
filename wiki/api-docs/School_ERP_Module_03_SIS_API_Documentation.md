@@ -391,3 +391,475 @@ All endpoints require standard security and tracing headers:
 }
 ```
 {expand}
+
+
+{expand:title=US-03010: Student Demographic Multi-Criteria Search & Filtering}
+
+### Endpoint
+`GET /api/v1/students/search`
+
+### Authorized Roles
+`ROLE_CLASS_TEACHER`, `ROLE_ACADEMIC_HEAD`, `ROLE_REGISTRAR`, `ROLE_SUPER_ADMIN`, `ROLE_OFFICE_CLERK`
+
+### Query Parameters
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `tenantId` | String | No | Target tenant ID |
+| `branchId` | String | No | Target branch ID |
+| `gradeId` | UUID | No | Grade identifier filter |
+| `sectionId` | UUID | No | Section identifier filter |
+| `houseId` | UUID | No | School house identifier filter |
+| `transportRouteId` | String | No | Bus / Transport route code |
+| `status` | String | No | `ACTIVE`, `PROMOTED`, `DETAINED`, `SUSPENDED`, `TRANSFERRED`, `GRADUATED` |
+
+### Success Response (`200 OK`)
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "studentId": "6eed0003-0001-4000-8000-000000000001",
+      "studentUid": "STU2026000010",
+      "firstName": "Rohan",
+      "lastName": "Verma",
+      "gradeName": "Grade 6",
+      "sectionName": "Section A",
+      "houseName": "Tagore",
+      "transportRouteId": "ROUTE-12",
+      "studentStatus": "ACTIVE",
+      "isOnHold": false
+    }
+  ]
+}
+```
+{expand}
+
+{expand:title=US-03011: Bulk Contact & Residential Address Updates}
+
+### Endpoint
+`PUT /api/v1/students/bulk-contact-update`
+
+### Authorized Roles
+`ROLE_SCHOOL_NURSE`, `ROLE_SCHOOL_PRINCIPAL`, `ROLE_REGISTRAR`, `ROLE_SUPER_ADMIN`, `ROLE_OFFICE_CLERK`
+
+### Request Payload
+```json
+{
+  "items": [
+    {
+      "studentId": "6eed0003-0001-4000-8000-000000000001",
+      "residentialAddress": "Flat 402, Sunshine Apartments, Delhi",
+      "emergencyContactPhone": "+919876543210"
+    }
+  ]
+}
+```
+
+### Success Response (`200 OK`)
+```json
+{
+  "success": true,
+  "message": "Bulk contacts updated successfully",
+  "data": 1
+}
+```
+{expand}
+
+{expand:title=US-03012: Extracurricular Activity Credits & House Points}
+
+### Endpoints
+- `POST /api/v1/students/{studentId}/activities` — Log student participation credits
+- `GET /api/v1/students/{studentId}/activities` — List student activity credits
+- `GET /api/v1/academic/houses/{houseId}/points` — Aggregate total points earned by a house
+
+### Authorized Roles
+- Logging: `ROLE_HOUSE_MASTER`, `ROLE_CLASS_TEACHER`, `ROLE_SUPER_ADMIN`, `ROLE_REGISTRAR`
+- Querying: `ROLE_HOUSE_MASTER`, `ROLE_CLASS_TEACHER`, `ROLE_ACADEMIC_HEAD`, `ROLE_REGISTRAR`, `ROLE_SUPER_ADMIN`, `ROLE_SCHOOL_PRINCIPAL`
+
+### Request Payload (`POST /api/v1/students/{studentId}/activities`)
+```json
+{
+  "activityName": "Inter-School Debate Championship",
+  "activityCategory": "Literary",
+  "pointsAwarded": 15,
+  "eventDate": "2026-10-15",
+  "remarks": "First Runner-up in senior division"
+}
+```
+
+### Success Response (`201 Created`)
+```json
+{
+  "success": true,
+  "message": "Activity credit recorded successfully",
+  "data": {
+    "creditId": "e1f2a3b4-0001-4000-8000-000000000001",
+    "studentId": "6eed0003-0001-4000-8000-000000000001",
+    "studentUid": "STU2026000012",
+    "studentName": "Ananya Sen",
+    "activityName": "Inter-School Debate Championship",
+    "activityCategory": "Literary",
+    "pointsAwarded": 15,
+    "eventDate": "2026-10-15",
+    "awardedByUserId": "house_master@kvs.local"
+  }
+}
+```
+{expand}
+
+{expand:title=US-03013: Alumni Credential Verification Engine}
+
+### Endpoints
+- `POST /api/v1/alumni/credential-verifications` — Submit third-party verification request
+- `GET /api/v1/alumni/credential-verifications/{requestId}` — Get verification details
+- `PATCH /api/v1/alumni/credential-verifications/{requestId}/verify` — Review & mark verified/rejected
+
+### Authorized Roles
+- Submit / View: `ROLE_ALUMNI_COORDINATOR`, `ROLE_OFFICE_CLERK`, `ROLE_REGISTRAR`, `ROLE_SUPER_ADMIN`
+- Review: `ROLE_ALUMNI_COORDINATOR`, `ROLE_REGISTRAR`, `ROLE_SUPER_ADMIN`
+
+### Request Payload (`POST /api/v1/alumni/credential-verifications`)
+```json
+{
+  "studentUid": "STU2024000100",
+  "requestorName": "Infosys Background Verification Team",
+  "requestorOrganization": "Infosys Limited",
+  "credentialType": "TRANSFER_CERTIFICATE",
+  "remarks": "Employment onboarding credential verification"
+}
+```
+
+### Success Response (`201 Created`)
+```json
+{
+  "success": true,
+  "message": "Credential verification request submitted successfully",
+  "data": {
+    "requestId": "c1d2e3f4-0001-4000-8000-000000000001",
+    "studentUid": "STU2024000100",
+    "studentName": "Aarav Sharma",
+    "requestorName": "Infosys Background Verification Team",
+    "requestorOrganization": "Infosys Limited",
+    "credentialType": "TRANSFER_CERTIFICATE",
+    "status": "PENDING",
+    "createdAt": "2026-10-18T06:00:00Z"
+  }
+}
+```
+{expand}
+
+{expand:title=US-03014: Student Photo Management & Batch Image Export}
+
+### Endpoints
+- `POST /api/v1/students/{studentId}/photo` — Update single student profile photo
+- `GET /api/v1/students/export-photo-directory` — Batch export student image directory by grade/section
+
+### Authorized Roles
+`ROLE_ACADEMIC_HEAD`, `ROLE_CLASS_TEACHER`, `ROLE_OFFICE_CLERK`, `ROLE_REGISTRAR`, `ROLE_SUPER_ADMIN`
+
+### Request Payload (`POST /api/v1/students/{studentId}/photo`)
+```json
+{
+  "photoUrl": "https://storage.kvs.local/photos/stu2026000014.jpg"
+}
+```
+
+### Success Response (`200 OK`)
+```json
+{
+  "success": true,
+  "message": "Student photo updated successfully",
+  "data": {
+    "studentId": "6eed0003-0001-4000-8000-000000000001",
+    "studentUid": "STU2026000014",
+    "profilePhotoUrl": "https://storage.kvs.local/photos/stu2026000014.jpg"
+  }
+}
+```
+{expand}
+
+{expand:title=US-03015: Administrative Holds Management}
+
+### Endpoints
+- `POST /api/v1/students/{studentId}/holds` — Place administrative hold
+- `PATCH /api/v1/students/holds/{holdId}/release` — Release active administrative hold
+- `GET /api/v1/students/{studentId}/holds` — List all administrative holds for a student
+
+### Authorized Roles
+- Place: `ROLE_SCHOOL_PRINCIPAL`, `ROLE_SCHOOL_NURSE`, `ROLE_REGISTRAR`, `ROLE_SUPER_ADMIN`
+- Release: `ROLE_SCHOOL_PRINCIPAL`, `ROLE_SCHOOL_NURSE`, `ROLE_REGISTRAR`, `ROLE_SUPER_ADMIN`
+- List: `ROLE_SCHOOL_PRINCIPAL`, `ROLE_SCHOOL_NURSE`, `ROLE_REGISTRAR`, `ROLE_SUPER_ADMIN`, `ROLE_OFFICE_CLERK`
+
+### Request Payload (`POST /api/v1/students/{studentId}/holds`)
+```json
+{
+  "holdType": "FEE_DEFAULT",
+  "reason": "Term 2 tuition fee payment default exceeding 45 days"
+}
+```
+
+### Success Response (`201 Created`)
+```json
+{
+  "success": true,
+  "message": "Administrative hold placed successfully",
+  "data": {
+    "holdId": "b1a2c3d4-0001-4000-8000-000000000001",
+    "studentId": "6eed0003-0001-4000-8000-000000000001",
+    "studentUid": "STU2026000015",
+    "holdType": "FEE_DEFAULT",
+    "reason": "Term 2 tuition fee payment default exceeding 45 days",
+    "isActive": true,
+    "placedByUserId": "principal@kvs.local",
+    "placedAt": "2026-10-18T06:10:00Z"
+  }
+}
+```
+{expand}
+
+{expand:title=US-03016: Periodic Health Metrics Tracking}
+
+### Endpoints
+- `POST /api/v1/students/{studentId}/health-metrics` — Record annual health checkup metrics
+- `GET /api/v1/students/{studentId}/health-metrics` — List historical health metric checkups
+
+### Authorized Roles
+`ROLE_SCHOOL_REGISTRAR`, `ROLE_REGISTRAR`, `ROLE_HOUSE_MASTER`, `ROLE_SCHOOL_NURSE`, `ROLE_SUPER_ADMIN`
+
+### Request Payload (`POST /api/v1/students/{studentId}/health-metrics`)
+```json
+{
+  "checkupDate": "2026-10-18",
+  "heightCm": 142.50,
+  "weightKg": 36.00,
+  "visionLeft": "6/6",
+  "visionRight": "6/6",
+  "healthNotes": "Normal vitals and healthy BMI"
+}
+```
+
+### Success Response (`201 Created`)
+```json
+{
+  "success": true,
+  "message": "Health metric recorded successfully",
+  "data": {
+    "metricId": "h1e2a3l4-0001-4000-8000-000000000001",
+    "studentId": "6eed0003-0001-4000-8000-000000000001",
+    "studentUid": "STU2026000016",
+    "checkupDate": "2026-10-18",
+    "heightCm": 142.50,
+    "weightKg": 36.00,
+    "bmi": 17.73,
+    "visionLeft": "6/6",
+    "visionRight": "6/6",
+    "checkedByUserId": "nurse@kvs.local"
+  }
+}
+```
+{expand}
+
+{expand:title=US-03017: Language Preferences & Elective Course Selections}
+
+### Endpoints
+- `POST /api/v1/students/{studentId}/electives` — Record or update elective selections
+- `GET /api/v1/students/{studentId}/electives` — Retrieve student elective selections
+
+### Authorized Roles
+`ROLE_OFFICE_CLERK`, `ROLE_ALUMNI_COORDINATOR`, `ROLE_CLASS_TEACHER`, `ROLE_REGISTRAR`, `ROLE_SUPER_ADMIN`
+
+### Request Payload (`POST /api/v1/students/{studentId}/electives`)
+```json
+{
+  "academicYearId": "6eed0003-0002-4000-8000-000000000002",
+  "firstLanguage": "English",
+  "secondLanguage": "Hindi",
+  "thirdLanguage": "Sanskrit",
+  "electiveSubjectCode": "CS-101"
+}
+```
+
+### Success Response (`201 Created`)
+```json
+{
+  "success": true,
+  "message": "Elective selection recorded successfully",
+  "data": {
+    "selectionId": "e1l2e3c4-0001-4000-8000-000000000001",
+    "studentId": "6eed0003-0001-4000-8000-000000000001",
+    "studentUid": "STU2026000017",
+    "academicYearId": "6eed0003-0002-4000-8000-000000000002",
+    "firstLanguage": "English",
+    "secondLanguage": "Hindi",
+    "thirdLanguage": "Sanskrit",
+    "electiveSubjectCode": "CS-101",
+    "status": "CONFIRMED"
+  }
+}
+```
+{expand}
+
+{expand:title=US-03018: Class Enrollment Roll Lists}
+
+### Endpoint
+`GET /api/v1/academic/sections/{sectionId}/roll-list`
+
+### Authorized Roles
+`ROLE_CLASS_TEACHER`, `ROLE_ACADEMIC_HEAD`, `ROLE_REGISTRAR`, `ROLE_SUPER_ADMIN`, `ROLE_OFFICE_CLERK`, `ROLE_SCHOOL_PRINCIPAL`
+
+### Success Response (`200 OK`)
+```json
+{
+  "success": true,
+  "data": {
+    "gradeId": "6eed0003-0001-4000-8000-000000000001",
+    "gradeName": "Grade 6",
+    "sectionId": "6eed0003-0002-4000-8000-000000000002",
+    "sectionName": "Section A",
+    "generatedDate": "2026-10-18",
+    "totalActiveStudents": 42,
+    "students": [
+      {
+        "studentId": "6eed0003-0001-4000-8000-000000000001",
+        "studentUid": "STU2026000018",
+        "rollNumber": 1,
+        "fullName": "Aarush Das",
+        "gender": "MALE",
+        "bloodGroup": "O+",
+        "houseName": "Tagore",
+        "emergencyContactPhone": "+91-9876543211",
+        "isOnHold": false
+      }
+    ]
+  }
+}
+```
+{expand}
+
+{expand:title=US-03019: Section Transfer Approval Workflow}
+
+### Endpoints
+- `POST /api/v1/students/{studentId}/section-transfers` — Propose student section transfer
+- `PATCH /api/v1/students/section-transfers/{transferId}/review` — Review transfer request
+- `GET /api/v1/students/{studentId}/section-transfers` — List student section transfer history
+
+### Authorized Roles
+- Propose / List: `ROLE_SCHOOL_NURSE`, `ROLE_ACADEMIC_HEAD`, `ROLE_SCHOOL_PRINCIPAL`, `ROLE_REGISTRAR`, `ROLE_SUPER_ADMIN`, `ROLE_CLASS_TEACHER`
+- Review: `ROLE_ACADEMIC_HEAD`, `ROLE_SCHOOL_PRINCIPAL`, `ROLE_REGISTRAR`, `ROLE_SUPER_ADMIN`
+
+### Request Payload (`POST /api/v1/students/{studentId}/section-transfers`)
+```json
+{
+  "targetSectionId": "6eed0003-0002-4000-8000-000000000002",
+  "reason": "Balancing section student strengths and language lab schedules"
+}
+```
+
+### Success Response (`201 Created`)
+```json
+{
+  "success": true,
+  "message": "Section transfer request submitted successfully",
+  "data": {
+    "transferId": "t1r2a3n4-0001-4000-8000-000000000001",
+    "studentId": "6eed0003-0001-4000-8000-000000000001",
+    "studentUid": "STU2026000019",
+    "toSectionId": "6eed0003-0002-4000-8000-000000000002",
+    "toSectionName": "Section B",
+    "status": "PENDING",
+    "reason": "Balancing section student strengths and language lab schedules",
+    "createdAt": "2026-10-18T06:20:00Z"
+  }
+}
+```
+{expand}
+
+---
+
+## 4. Scenario Matrix & Role Access Decisions (US-03020 to US-03100)
+
+Stories `US-03020` through `US-03100` execute the 20 fundamental capabilities across multi-scenario variations (Scenarios 2–6) rotating across organizational roles. Each row indicates whether the designated actor is authorized (granted: 2xx response) or restricted (not granted: 403 Forbidden).
+
+| Story ID | Capability | Sub-Module Domain | Rotated Scenario Actor | Access Decision |
+|---|---|---|---|---|
+| **US-03020** | Permanent Student UID Generation | UID Master Engine | `House Master` | Restricted (403) |
+| **US-03021** | Real-Time Medical Alerts & Emergency | Demographics & Medical Alerts | `Alumni Coordinator` | Restricted (403) |
+| **US-03022** | Multi-Sibling Linking | Parent Accounts & Guardian Mapping | `Academic Head` | Restricted (403) |
+| **US-03023** | Academic Section & House Allocation | Section & House Allocation | `School Principal` | Restricted (403) |
+| **US-03024** | Barcoded ID Card Generation | ID Card Generation Engine | `School Registrar` | Granted (2xx) |
+| **US-03025** | Annual Batch Promotions | Academic Session Batch Promotion | `Office Clerk` | Restricted (403) |
+| **US-03026** | Dual Sign-off Transfer Certificates | Transfer Certificate Dual Sign-off | `Class Teacher` | Restricted (403) |
+| **US-03027** | Bonafide & Character Certificates | Bonafide & Character Certificate | `School Nurse` | Restricted (403) |
+| **US-03028** | Disciplinary Incidents & Counseling | Disciplinary Incident Logs | `House Master` | Restricted (403) |
+| **US-03029** | Permanent Alumni Archiving | Permanent Alumni Registry | `Alumni Coordinator` | Granted (2xx) |
+| **US-03030** | Demographic Multi-Criteria Filter | Demographic Filtering | `Academic Head` | Granted (2xx) |
+| **US-03031** | Bulk Contact Update | Bulk Contact Updates | `School Principal` | Granted (2xx) |
+| **US-03032** | Extracurricular Participation Credits | Extracurricular & House Points | `School Registrar` | Granted (2xx) |
+| **US-03033** | Alumni Credential Verification | Historical Archive Verification | `Office Clerk` | Granted (2xx) |
+| **US-03034** | Student Photo Management | Photo Updates & Directory Export | `Class Teacher` | Granted (2xx) |
+| **US-03035** | Administrative Hold Management | Administrative Holds | `School Nurse` | Granted (2xx) |
+| **US-03036** | Periodic Health Metrics Tracking | Health Metrics & BMI Tracking | `House Master` | Granted (2xx) |
+| **US-03037** | Language Preferences & Electives | Language & Elective Selection | `Alumni Coordinator` | Granted (2xx) |
+| **US-03038** | Class Enrollment Roll Lists | Attendance Roll List Generation | `Academic Head` | Granted (2xx) |
+| **US-03039** | Section Transfer Workflow | Section Transfer Approval Workflow | `School Principal` | Granted (2xx) |
+| **US-03040** | Permanent Student UID Generation | UID Master Engine | `School Registrar` | Granted (2xx) |
+| **US-03041** | Real-Time Medical Alerts & Emergency | Demographics & Medical Alerts | `Office Clerk` | Restricted (403) |
+| **US-03042** | Multi-Sibling Linking | Parent Accounts & Guardian Mapping | `Class Teacher` | Restricted (403) |
+| **US-03043** | Academic Section & House Allocation | Section & House Allocation | `School Nurse` | Restricted (403) |
+| **US-03044** | Barcoded ID Card Generation | ID Card Generation Engine | `House Master` | Restricted (403) |
+| **US-03045** | Annual Batch Promotions | Academic Session Batch Promotion | `Alumni Coordinator` | Restricted (403) |
+| **US-03046** | Dual Sign-off Transfer Certificates | Transfer Certificate Dual Sign-off | `Academic Head` | Restricted (403) |
+| **US-03047** | Bonafide & Character Certificates | Bonafide & Character Certificate | `School Principal` | Granted (2xx) |
+| **US-03048** | Disciplinary Incidents & Counseling | Disciplinary Incident Logs | `School Registrar` | Restricted (403) |
+| **US-03049** | Permanent Alumni Archiving | Permanent Alumni Registry | `Office Clerk` | Restricted (403) |
+| **US-03050** | Demographic Multi-Criteria Filter | Demographic Filtering | `Class Teacher` | Granted (2xx) |
+| **US-03051** | Bulk Contact Update | Bulk Contact Updates | `School Nurse` | Granted (2xx) |
+| **US-03052** | Extracurricular Participation Credits | Extracurricular & House Points | `House Master` | Granted (2xx) |
+| **US-03053** | Alumni Credential Verification | Historical Archive Verification | `Alumni Coordinator` | Granted (2xx) |
+| **US-03054** | Student Photo Management | Photo Updates & Directory Export | `Academic Head` | Granted (2xx) |
+| **US-03055** | Administrative Hold Management | Administrative Holds | `School Principal` | Granted (2xx) |
+| **US-03056** | Periodic Health Metrics Tracking | Health Metrics & BMI Tracking | `School Registrar` | Granted (2xx) |
+| **US-03057** | Language Preferences & Electives | Language & Elective Selection | `Office Clerk` | Granted (2xx) |
+| **US-03058** | Class Enrollment Roll Lists | Attendance Roll List Generation | `Class Teacher` | Granted (2xx) |
+| **US-03059** | Section Transfer Workflow | Section Transfer Approval Workflow | `School Nurse` | Granted (2xx) |
+| **US-03060** | Permanent Student UID Generation | UID Master Engine | `House Master` | Restricted (403) |
+| **US-03061** | Real-Time Medical Alerts & Emergency | Demographics & Medical Alerts | `Alumni Coordinator` | Restricted (403) |
+| **US-03062** | Multi-Sibling Linking | Parent Accounts & Guardian Mapping | `Academic Head` | Restricted (403) |
+| **US-03063** | Academic Section & House Allocation | Section & House Allocation | `School Principal` | Restricted (403) |
+| **US-03064** | Barcoded ID Card Generation | ID Card Generation Engine | `School Registrar` | Granted (2xx) |
+| **US-03065** | Annual Batch Promotions | Academic Session Batch Promotion | `Office Clerk` | Restricted (403) |
+| **US-03066** | Dual Sign-off Transfer Certificates | Transfer Certificate Dual Sign-off | `Class Teacher` | Restricted (403) |
+| **US-03067** | Bonafide & Character Certificates | Bonafide & Character Certificate | `School Nurse` | Restricted (403) |
+| **US-03068** | Disciplinary Incidents & Counseling | Disciplinary Incident Logs | `House Master` | Restricted (403) |
+| **US-03069** | Permanent Alumni Archiving | Permanent Alumni Registry | `Alumni Coordinator` | Granted (2xx) |
+| **US-03070** | Demographic Multi-Criteria Filter | Demographic Filtering | `Academic Head` | Granted (2xx) |
+| **US-03071** | Bulk Contact Update | Bulk Contact Updates | `School Principal` | Granted (2xx) |
+| **US-03072** | Extracurricular Participation Credits | Extracurricular & House Points | `School Registrar` | Granted (2xx) |
+| **US-03073** | Alumni Credential Verification | Historical Archive Verification | `Office Clerk` | Granted (2xx) |
+| **US-03074** | Student Photo Management | Photo Updates & Directory Export | `Class Teacher` | Granted (2xx) |
+| **US-03075** | Administrative Hold Management | Administrative Holds | `School Nurse` | Granted (2xx) |
+| **US-03076** | Periodic Health Metrics Tracking | Health Metrics & BMI Tracking | `House Master` | Granted (2xx) |
+| **US-03077** | Language Preferences & Electives | Language & Elective Selection | `Alumni Coordinator` | Granted (2xx) |
+| **US-03078** | Class Enrollment Roll Lists | Attendance Roll List Generation | `Academic Head` | Granted (2xx) |
+| **US-03079** | Section Transfer Workflow | Section Transfer Approval Workflow | `School Principal` | Granted (2xx) |
+| **US-03080** | Permanent Student UID Generation | UID Master Engine | `School Registrar` | Granted (2xx) |
+| **US-03081** | Real-Time Medical Alerts & Emergency | Demographics & Medical Alerts | `Office Clerk` | Restricted (403) |
+| **US-03082** | Multi-Sibling Linking | Parent Accounts & Guardian Mapping | `Class Teacher` | Restricted (403) |
+| **US-03083** | Academic Section & House Allocation | Section & House Allocation | `School Nurse` | Restricted (403) |
+| **US-03084** | Barcoded ID Card Generation | ID Card Generation Engine | `House Master` | Restricted (403) |
+| **US-03085** | Annual Batch Promotions | Academic Session Batch Promotion | `Alumni Coordinator` | Restricted (403) |
+| **US-03086** | Dual Sign-off Transfer Certificates | Transfer Certificate Dual Sign-off | `Academic Head` | Restricted (403) |
+| **US-03087** | Bonafide & Character Certificates | Bonafide & Character Certificate | `School Principal` | Granted (2xx) |
+| **US-03088** | Disciplinary Incidents & Counseling | Disciplinary Incident Logs | `School Registrar` | Restricted (403) |
+| **US-03089** | Permanent Alumni Archiving | Permanent Alumni Registry | `Office Clerk` | Restricted (403) |
+| **US-03090** | Demographic Multi-Criteria Filter | Demographic Filtering | `Class Teacher` | Granted (2xx) |
+| **US-03091** | Bulk Contact Update | Bulk Contact Updates | `School Nurse` | Granted (2xx) |
+| **US-03092** | Extracurricular Participation Credits | Extracurricular & House Points | `House Master` | Granted (2xx) |
+| **US-03093** | Alumni Credential Verification | Historical Archive Verification | `Alumni Coordinator` | Granted (2xx) |
+| **US-03094** | Student Photo Management | Photo Updates & Directory Export | `Academic Head` | Granted (2xx) |
+| **US-03095** | Administrative Hold Management | Administrative Holds | `School Principal` | Granted (2xx) |
+| **US-03096** | Periodic Health Metrics Tracking | Health Metrics & BMI Tracking | `School Registrar` | Granted (2xx) |
+| **US-03097** | Language Preferences & Electives | Language & Elective Selection | `Office Clerk` | Granted (2xx) |
+| **US-03098** | Class Enrollment Roll Lists | Attendance Roll List Generation | `Class Teacher` | Granted (2xx) |
+| **US-03099** | Section Transfer Workflow | Section Transfer Approval Workflow | `School Nurse` | Granted (2xx) |
+| **US-03100** | Permanent Student UID Generation | UID Master Engine | `House Master` | Restricted (403) |

@@ -31,3 +31,6 @@ out/
 .vscode/
 
 *.log
+
+# Local student photo and document vault
+student-vault/

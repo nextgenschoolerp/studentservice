@@ -30,14 +30,16 @@ public class DisciplinaryService {
     @Autowired
     private StudentAuditService auditService;
 
+    @Autowired
+    private TenantAccessGuard tenantGuard;
+
     /**
      * US-03008: Track student disciplinary incidents and record counseling intervention logs
      */
     @Transactional
     public DisciplinaryIncidentResponse recordIncident(UUID studentId, RecordDisciplinaryIncidentRequest request) {
         log.info("Recording disciplinary incident for student: {}", studentId);
-        StudentMaster student = studentRepository.findByStudentId(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("StudentMaster", "studentId", studentId));
+        StudentMaster student = findStudent(studentId);
 
         String reporter = SecurityUtils.getCurrentUserEmail().orElse("counselor");
 
@@ -62,12 +64,19 @@ public class DisciplinaryService {
 
     @Transactional(readOnly = true)
     public List<DisciplinaryIncidentResponse> listIncidents(UUID studentId) {
-        StudentMaster student = studentRepository.findByStudentId(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("StudentMaster", "studentId", studentId));
+        StudentMaster student = findStudent(studentId);
 
         return incidentRepository.findByStudentIdOrderByIncidentDateDesc(studentId).stream()
                 .map(i -> mapToResponse(i, student))
                 .collect(Collectors.toList());
+    }
+
+    /** Loads a student of the caller's tenant; another tenant's student is reported as not found. */
+    private StudentMaster findStudent(UUID studentId) {
+        StudentMaster student = studentRepository.findByStudentId(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("StudentMaster", "studentId", studentId));
+        tenantGuard.requireTenantRecord(student.getTenantId(), "StudentMaster", "studentId", studentId);
+        return student;
     }
 
     private DisciplinaryIncidentResponse mapToResponse(DisciplinaryIncident incident, StudentMaster student) {

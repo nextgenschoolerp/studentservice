@@ -2,6 +2,7 @@ package com.kvs.student.controller;
 
 import com.kvs.core.dto.ApiResponse;
 import com.kvs.student.dto.*;
+import com.kvs.student.enums.StudentStatus;
 import com.kvs.student.service.StudentService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -69,10 +70,11 @@ public class StudentController {
     }
 
     /**
-     * List students by tenant and branch
+     * List students by tenant and branch (read-only for the school nurse, so they can find a student's record).
+     * The tenant must be the caller's own unless the caller is a super administrator.
      */
     @GetMapping
-    @PreAuthorize("hasAnyRole('REGISTRAR', 'SUPER_ADMIN', 'OFFICE_CLERK', 'CLASS_TEACHER', 'SCHOOL_PRINCIPAL') or hasAnyAuthority('ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN', 'ROLE_OFFICE_CLERK', 'ROLE_CLASS_TEACHER', 'ROLE_SCHOOL_PRINCIPAL')")
+    @PreAuthorize("hasAnyRole('REGISTRAR', 'SUPER_ADMIN', 'OFFICE_CLERK', 'CLASS_TEACHER', 'SCHOOL_PRINCIPAL', 'SCHOOL_NURSE') or hasAnyAuthority('ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN', 'ROLE_OFFICE_CLERK', 'ROLE_CLASS_TEACHER', 'ROLE_SCHOOL_PRINCIPAL', 'ROLE_SCHOOL_NURSE')")
     public ResponseEntity<ApiResponse<List<StudentResponse>>> listStudents(
             @RequestParam("tenantId") String tenantId,
             @RequestParam("branchId") String branchId) {
@@ -130,5 +132,170 @@ public class StudentController {
         log.info("Request to generate ID card for student: {}", studentId);
         IdCardResponse response = studentService.generateIdCard(studentId);
         return ResponseEntity.ok(ApiResponse.success("ID card data generated successfully", response));
+    }
+
+    /**
+     * US-03010: Filter student demographic records by class, section, house, and transport route
+     */
+    @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('CLASS_TEACHER', 'ACADEMIC_HEAD', 'REGISTRAR', 'SUPER_ADMIN', 'OFFICE_CLERK') or hasAnyAuthority('ROLE_CLASS_TEACHER', 'ROLE_ACADEMIC_HEAD', 'ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN', 'ROLE_OFFICE_CLERK')")
+    public ResponseEntity<ApiResponse<List<StudentResponse>>> searchStudents(
+            @RequestParam(value = "tenantId", required = false) String tenantId,
+            @RequestParam(value = "branchId", required = false) String branchId,
+            @RequestParam(value = "gradeId", required = false) UUID gradeId,
+            @RequestParam(value = "sectionId", required = false) UUID sectionId,
+            @RequestParam(value = "houseId", required = false) UUID houseId,
+            @RequestParam(value = "transportRouteId", required = false) String transportRouteId,
+            @RequestParam(value = "status", required = false) StudentStatus status) {
+        log.info("Filtering student demographics for tenant: {}, grade: {}, section: {}", tenantId, gradeId, sectionId);
+        List<StudentResponse> response = studentService.filterStudents(tenantId, branchId, gradeId, sectionId, houseId, transportRouteId, status);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * US-03011: Bulk update student contact addresses and guardian mobile numbers
+     */
+    @PutMapping("/bulk-contact-update")
+    @PreAuthorize("hasAnyRole('SCHOOL_NURSE', 'SCHOOL_PRINCIPAL', 'REGISTRAR', 'SUPER_ADMIN', 'OFFICE_CLERK') or hasAnyAuthority('ROLE_SCHOOL_NURSE', 'ROLE_SCHOOL_PRINCIPAL', 'ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN', 'ROLE_OFFICE_CLERK')")
+    public ResponseEntity<ApiResponse<Integer>> bulkUpdateContacts(
+            @Valid @RequestBody BulkContactUpdateRequest request) {
+        log.info("Bulk updating student contact addresses for {} items", request.getItems().size());
+        int updated = studentService.bulkUpdateContacts(request);
+        return ResponseEntity.ok(ApiResponse.success("Bulk contacts updated successfully", updated));
+    }
+
+    /**
+     * US-03014: Manage student photo updates and batch export profile image directories
+     */
+    @PostMapping("/{studentId}/photo")
+    @PreAuthorize("hasAnyRole('ACADEMIC_HEAD', 'CLASS_TEACHER', 'OFFICE_CLERK', 'REGISTRAR', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_ACADEMIC_HEAD', 'ROLE_CLASS_TEACHER', 'ROLE_OFFICE_CLERK', 'ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<StudentResponse>> updateStudentPhoto(
+            @PathVariable("studentId") UUID studentId,
+            @Valid @RequestBody UpdatePhotoRequest request) {
+        log.info("Updating profile photo for student: {}", studentId);
+        StudentResponse response = studentService.updateStudentPhoto(studentId, request);
+        return ResponseEntity.ok(ApiResponse.success("Student photo updated successfully", response));
+    }
+
+    @GetMapping("/export-photo-directory")
+    @PreAuthorize("hasAnyRole('ACADEMIC_HEAD', 'CLASS_TEACHER', 'OFFICE_CLERK', 'REGISTRAR', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_ACADEMIC_HEAD', 'ROLE_CLASS_TEACHER', 'ROLE_OFFICE_CLERK', 'ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<List<PhotoExportItemResponse>>> exportPhotoDirectory(
+            @RequestParam("gradeId") UUID gradeId,
+            @RequestParam("sectionId") UUID sectionId) {
+        log.info("Exporting photo directory for grade: {}, section: {}", gradeId, sectionId);
+        List<PhotoExportItemResponse> response = studentService.exportPhotoDirectory(gradeId, sectionId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * US-03015: Flag student profiles under administrative hold for fee or document default
+     */
+    @PostMapping("/{studentId}/holds")
+    @PreAuthorize("hasAnyRole('SCHOOL_PRINCIPAL', 'SCHOOL_NURSE', 'REGISTRAR', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_SCHOOL_PRINCIPAL', 'ROLE_SCHOOL_NURSE', 'ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<AdministrativeHoldResponse>> placeHold(
+            @PathVariable("studentId") UUID studentId,
+            @Valid @RequestBody PlaceHoldRequest request) {
+        log.info("Placing administrative hold for student: {}", studentId);
+        AdministrativeHoldResponse response = studentService.placeHold(studentId, request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Administrative hold placed successfully", response));
+    }
+
+    @PatchMapping("/holds/{holdId}/release")
+    @PreAuthorize("hasAnyRole('SCHOOL_PRINCIPAL', 'SCHOOL_NURSE', 'REGISTRAR', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_SCHOOL_PRINCIPAL', 'ROLE_SCHOOL_NURSE', 'ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<AdministrativeHoldResponse>> releaseHold(
+            @PathVariable("holdId") UUID holdId,
+            @Valid @RequestBody ReleaseHoldRequest request) {
+        log.info("Releasing administrative hold: {}", holdId);
+        AdministrativeHoldResponse response = studentService.releaseHold(holdId, request);
+        return ResponseEntity.ok(ApiResponse.success("Administrative hold released successfully", response));
+    }
+
+    @GetMapping("/{studentId}/holds")
+    @PreAuthorize("hasAnyRole('SCHOOL_PRINCIPAL', 'SCHOOL_NURSE', 'REGISTRAR', 'SUPER_ADMIN', 'OFFICE_CLERK') or hasAnyAuthority('ROLE_SCHOOL_PRINCIPAL', 'ROLE_SCHOOL_NURSE', 'ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN', 'ROLE_OFFICE_CLERK')")
+    public ResponseEntity<ApiResponse<List<AdministrativeHoldResponse>>> listHolds(
+            @PathVariable("studentId") UUID studentId) {
+        log.info("Fetching administrative holds for student: {}", studentId);
+        List<AdministrativeHoldResponse> response = studentService.listHolds(studentId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * US-03016: Track student height and weight metrics during annual health checkups
+     */
+    @PostMapping("/{studentId}/health-metrics")
+    @PreAuthorize("hasAnyRole('SCHOOL_REGISTRAR', 'REGISTRAR', 'HOUSE_MASTER', 'SCHOOL_NURSE', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_SCHOOL_REGISTRAR', 'ROLE_REGISTRAR', 'ROLE_HOUSE_MASTER', 'ROLE_SCHOOL_NURSE', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<HealthMetricResponse>> recordHealthMetric(
+            @PathVariable("studentId") UUID studentId,
+            @Valid @RequestBody RecordHealthMetricRequest request) {
+        log.info("Recording health metric for student: {}", studentId);
+        HealthMetricResponse response = studentService.recordHealthMetric(studentId, request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Health metric recorded successfully", response));
+    }
+
+    @GetMapping("/{studentId}/health-metrics")
+    @PreAuthorize("hasAnyRole('SCHOOL_REGISTRAR', 'REGISTRAR', 'HOUSE_MASTER', 'SCHOOL_NURSE', 'SUPER_ADMIN', 'CLASS_TEACHER') or hasAnyAuthority('ROLE_SCHOOL_REGISTRAR', 'ROLE_REGISTRAR', 'ROLE_HOUSE_MASTER', 'ROLE_SCHOOL_NURSE', 'ROLE_SUPER_ADMIN', 'ROLE_CLASS_TEACHER')")
+    public ResponseEntity<ApiResponse<List<HealthMetricResponse>>> listHealthMetrics(
+            @PathVariable("studentId") UUID studentId) {
+        log.info("Fetching health metrics for student: {}", studentId);
+        List<HealthMetricResponse> response = studentService.listHealthMetrics(studentId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * US-03017: Record student language preferences and elective course selections
+     */
+    @PostMapping("/{studentId}/electives")
+    @PreAuthorize("hasAnyRole('OFFICE_CLERK', 'ALUMNI_COORDINATOR', 'CLASS_TEACHER', 'REGISTRAR', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_OFFICE_CLERK', 'ROLE_ALUMNI_COORDINATOR', 'ROLE_CLASS_TEACHER', 'ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<ElectiveSelectionResponse>> recordElectiveSelection(
+            @PathVariable("studentId") UUID studentId,
+            @Valid @RequestBody RecordElectiveSelectionRequest request) {
+        log.info("Recording elective selection for student: {}", studentId);
+        ElectiveSelectionResponse response = studentService.recordElectiveSelection(studentId, request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Elective selection recorded successfully", response));
+    }
+
+    @GetMapping("/{studentId}/electives")
+    @PreAuthorize("hasAnyRole('OFFICE_CLERK', 'ALUMNI_COORDINATOR', 'CLASS_TEACHER', 'REGISTRAR', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_OFFICE_CLERK', 'ROLE_ALUMNI_COORDINATOR', 'ROLE_CLASS_TEACHER', 'ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<List<ElectiveSelectionResponse>>> getElectives(
+            @PathVariable("studentId") UUID studentId) {
+        log.info("Fetching elective selections for student: {}", studentId);
+        List<ElectiveSelectionResponse> response = studentService.getElectives(studentId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * US-03019: Process student section transfer requests with academic head approval
+     */
+    @PostMapping("/{studentId}/section-transfers")
+    @PreAuthorize("hasAnyRole('SCHOOL_NURSE', 'ACADEMIC_HEAD', 'SCHOOL_PRINCIPAL', 'REGISTRAR', 'SUPER_ADMIN', 'CLASS_TEACHER') or hasAnyAuthority('ROLE_SCHOOL_NURSE', 'ROLE_ACADEMIC_HEAD', 'ROLE_SCHOOL_PRINCIPAL', 'ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN', 'ROLE_CLASS_TEACHER')")
+    public ResponseEntity<ApiResponse<SectionTransferResponse>> proposeSectionTransfer(
+            @PathVariable("studentId") UUID studentId,
+            @Valid @RequestBody SectionTransferProposalRequest request) {
+        log.info("Proposing section transfer for student: {}", studentId);
+        SectionTransferResponse response = studentService.proposeSectionTransfer(studentId, request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Section transfer request submitted successfully", response));
+    }
+
+    @PatchMapping("/section-transfers/{transferId}/review")
+    @PreAuthorize("hasAnyRole('ACADEMIC_HEAD', 'SCHOOL_PRINCIPAL', 'REGISTRAR', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_ACADEMIC_HEAD', 'ROLE_SCHOOL_PRINCIPAL', 'ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<SectionTransferResponse>> reviewSectionTransfer(
+            @PathVariable("transferId") UUID transferId,
+            @Valid @RequestBody ReviewSectionTransferRequest request) {
+        log.info("Reviewing section transfer request: {}", transferId);
+        SectionTransferResponse response = studentService.reviewSectionTransfer(transferId, request);
+        return ResponseEntity.ok(ApiResponse.success("Section transfer reviewed successfully", response));
+    }
+
+    @GetMapping("/{studentId}/section-transfers")
+    @PreAuthorize("hasAnyRole('SCHOOL_NURSE', 'ACADEMIC_HEAD', 'SCHOOL_PRINCIPAL', 'REGISTRAR', 'SUPER_ADMIN', 'CLASS_TEACHER') or hasAnyAuthority('ROLE_SCHOOL_NURSE', 'ROLE_ACADEMIC_HEAD', 'ROLE_SCHOOL_PRINCIPAL', 'ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN', 'ROLE_CLASS_TEACHER')")
+    public ResponseEntity<ApiResponse<List<SectionTransferResponse>>> listSectionTransfers(
+            @PathVariable("studentId") UUID studentId) {
+        log.info("Fetching section transfers for student: {}", studentId);
+        List<SectionTransferResponse> response = studentService.listSectionTransfers(studentId);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }
