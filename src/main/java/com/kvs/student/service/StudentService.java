@@ -20,7 +20,9 @@ import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -279,21 +281,33 @@ public class StudentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Grade", "fromGradeId", request.getFromGradeId()));
         Grade toGrade = gradeRepository.findById(request.getToGradeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Grade", "toGradeId", request.getToGradeId()));
-
-        List<StudentMaster> studentsToPromote;
-        if (request.getStudentIds() != null && !request.getStudentIds().isEmpty()) {
-            studentsToPromote = studentRepository.findAllById(request.getStudentIds()).stream()
-                    .filter(s -> s.getGradeId().equals(fromGrade.getGradeId()))
-                    .collect(Collectors.toList());
-        } else {
-            studentsToPromote = studentRepository.findAll().stream()
-                    .filter(s -> fromGrade.getGradeId().equals(s.getGradeId()))
-                    .filter(s -> s.getStudentStatus() == StudentStatus.ACTIVE)
-                    .collect(Collectors.toList());
+        tenantGuard.requireTenantRecord(fromGrade.getTenantId(), "Grade", "fromGradeId", fromGrade.getGradeId());
+        if (!fromGrade.getTenantId().equals(toGrade.getTenantId())) {
+            throw new ResourceNotFoundException("Grade", "toGradeId", request.getToGradeId());
+        }
+        if (fromGrade.getGradeId().equals(toGrade.getGradeId())) {
+            throw new BadRequestException("toGradeId must differ from fromGradeId");
         }
 
+        // Only current students of the class move up; transferred or graduated students stay where they are
+        List<StudentMaster> studentsToPromote = (request.getStudentIds() != null && !request.getStudentIds().isEmpty()
+                ? studentRepository.findAllById(request.getStudentIds()).stream()
+                : studentRepository.findAll().stream())
+                .filter(s -> fromGrade.getGradeId().equals(s.getGradeId()))
+                .filter(s -> fromGrade.getTenantId().equals(s.getTenantId()))
+                .filter(s -> s.getStudentStatus() == StudentStatus.ACTIVE || s.getStudentStatus() == StudentStatus.PROMOTED)
+                .collect(Collectors.toList());
+
+        // Each student keeps their section letter in the next class (7-A → 8-A) when that section exists
+        Map<UUID, UUID> nextSection = new HashMap<>();
         for (StudentMaster student : studentsToPromote) {
+            UUID sectionId = student.getSectionId() == null ? null
+                    : nextSection.computeIfAbsent(student.getSectionId(), id -> sectionRepository.findById(id)
+                            .flatMap(sec -> sectionRepository.findByGradeIdAndSectionName(toGrade.getGradeId(), sec.getSectionName()))
+                            .map(Section::getSectionId)
+                            .orElse(null));
             student.setGradeId(toGrade.getGradeId());
+            student.setSectionId(sectionId);
             student.setStudentStatus(StudentStatus.PROMOTED);
             studentRepository.save(student);
         }
