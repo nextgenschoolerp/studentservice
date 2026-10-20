@@ -18,5 +18,6 @@ public interface StudentMasterRepository extends JpaRepository<StudentMaster, UU
     List<StudentMaster> findByGradeIdAndSectionId(UUID gradeId, UUID sectionId);
     List<StudentMaster> findBySectionIdOrderByRollNumberAsc(UUID sectionId);
     List<StudentMaster> findByParentAccountId(String parentAccountId);
+    List<StudentMaster> findByTenantId(String tenantId);
     long countByGradeIdAndSectionId(UUID gradeId, UUID sectionId);
 }

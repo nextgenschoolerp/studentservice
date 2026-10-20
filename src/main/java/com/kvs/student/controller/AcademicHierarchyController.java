@@ -77,7 +77,8 @@ public class AcademicHierarchyController {
      * List grades
      */
     @GetMapping("/grades")
-    @PreAuthorize("hasAnyRole('REGISTRAR', 'SUPER_ADMIN', 'OFFICE_CLERK', 'SCHOOL_PRINCIPAL', 'CLASS_TEACHER') or hasAnyAuthority('ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN', 'ROLE_OFFICE_CLERK', 'ROLE_SCHOOL_PRINCIPAL', 'ROLE_CLASS_TEACHER')")
+    // Class and section names are reference data for every teaching screen (Academics mark entry, broadsheets, attendance registers)
+    @PreAuthorize("hasAnyRole('REGISTRAR', 'SUPER_ADMIN', 'OFFICE_CLERK', 'SCHOOL_PRINCIPAL', 'CLASS_TEACHER', 'SUBJECT_TEACHER', 'EXAM_CONTROLLER', 'VICE_PRINCIPAL', 'ACADEMIC_AUDITOR', 'ACADEMIC_HEAD')")
     public ResponseEntity<ApiResponse<List<Grade>>> listGrades(
             @RequestParam("tenantId") String tenantId) {
         List<Grade> grades = academicService.listGrades(tenantId);
@@ -101,7 +102,8 @@ public class AcademicHierarchyController {
      * List sections for grade
      */
     @GetMapping("/sections")
-    @PreAuthorize("hasAnyRole('REGISTRAR', 'SUPER_ADMIN', 'OFFICE_CLERK', 'SCHOOL_PRINCIPAL', 'CLASS_TEACHER') or hasAnyAuthority('ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN', 'ROLE_OFFICE_CLERK', 'ROLE_SCHOOL_PRINCIPAL', 'ROLE_CLASS_TEACHER')")
+    // Class and section names are reference data for every teaching screen (Academics mark entry, broadsheets, attendance registers)
+    @PreAuthorize("hasAnyRole('REGISTRAR', 'SUPER_ADMIN', 'OFFICE_CLERK', 'SCHOOL_PRINCIPAL', 'CLASS_TEACHER', 'SUBJECT_TEACHER', 'EXAM_CONTROLLER', 'VICE_PRINCIPAL', 'ACADEMIC_AUDITOR', 'ACADEMIC_HEAD')")
     public ResponseEntity<ApiResponse<List<Section>>> listSections(
             @RequestParam("gradeId") UUID gradeId) {
         List<Section> sections = academicService.listSections(gradeId);

@@ -136,8 +136,9 @@ Roles are the `@PreAuthorize` of each endpoint, read from the running service (`
 - [x] [`postman/School_ERP_StudentService.postman_collection.json`](postman/School_ERP_StudentService.postman_collection.json): 101 story folders (US-03000 … US-03100), 112 requests
 
 ### UI mapping
-- [x] Vite proxy `/api/v1/students`, `/api/v1/academic`, `/api/v1/alumni` → `http://localhost:8084/studentservice` (`STUDENT_SERVICE_URL`)
+- [x] Vite proxy `/api/v1/students`, `/api/v1/academic`, `/api/v1/alumni`, `/api/v1/attendance` → `http://localhost:8084/studentservice` (`STUDENT_SERVICE_URL`)
 - [x] Students directory, student profile (overview, guardians, documents, conduct, certificates, ID card), Add / Edit student, **Promote class** — [`frontend/docs/studentservice-api-mapping.md`](../frontend/docs/studentservice-api-mapping.md)
+- [x] **Daily attendance** (new, on the US-03018 roll list): `AttendanceController` `/api/v1/attendance` — AM / PM registers per section (`GET|PUT /sections/{id}/register`), school day figure (`/summary`), trend (`/trend`), absence history (`/absences`), guardian follow-up of unexcused absences (`/follow-ups`, `PATCH /records/{id}/follow-up`), a student's attendance to date (`/students/{id}`). Tables `student_attendance`, `attendance_registers` (Hibernate). Rules: no future dates; excused needs a reason; only students on the section's roll; class teachers correct up to 7 days back, principals any time. `AttendanceIntegrationTest`: 13 tests. Wired to the Attendance page, the profile card / tab, Overview and Reports
 - [x] Admissions → Review application → **Enrol student** creates the studentservice record — [`frontend/docs/admissionservice-api-mapping.md`](../frontend/docs/admissionservice-api-mapping.md)
 
 ### Step 8: API Wiki
@@ -146,6 +147,7 @@ Roles are the `@PreAuthorize` of each endpoint, read from the running service (`
 ### Step 9: Seed
 - [x] [`src/main/resources/db/seed/module03_student_seed.sql`](src/main/resources/db/seed/module03_student_seed.sql) (re-runnable): Module 03 roles and one DPS North account per role; sessions 2025-2026 / 2026-2027; Nursery … Class 12 with sections A–E; four houses; 54 students (52 North, 2 South) with guardians, siblings, certificates, incidents, a transferred and a graduated student
 - [x] [`src/main/resources/db/seed/module05_exam_seed.sql`](src/main/resources/db/seed/module05_exam_seed.sql) is kept here too, beside the Module 03 seed whose students it grades
+- [x] [`src/main/resources/db/seed/module03_attendance_seed.sql`](src/main/resources/db/seed/module03_attendance_seed.sql) (re-runnable, run after the Module 03 seed): the last 10 school days of AM / PM registers for every DPS North section, dates relative to the run day; Myra's persistent absence; today's AM for every section except Class 4-A and 6-A (left to take), with Kabir unexcused (open follow-up), Arjun excused and Zara late
 
 ---
 
@@ -169,7 +171,7 @@ Run on 19 Oct 2026:
 | `AccessRuleControllerIntegrationTest` | 2 | pass |
 | **Total** | **122** | **0 failures, 0 errors** |
 
-- [x] UI regression `node .agents/skills/test-ui/scripts/api-regression.mjs --service studentservice`: **38 of 38 cases pass** (test stack, 19 Oct 2026)
+- [x] UI regression `node .agents/skills/test-ui/scripts/api-regression.mjs --service studentservice`: **52 of 52 cases pass** incl. ATT-01..14 attendance (test stack, 20 Oct 2026)
 - [x] Student lifecycle runner (`/dev/student-lifecycle-workflow.html`): all 15 steps green, from enquiry to promotion (enrolment, promotion and the record check are studentservice steps)
 - [x] Browser: admission → enrol into a section → fees → Annual results → **Promote class** (Class 7-A → 8-A, the failing student held back); promoted students show **Promoted** in 8-A and keep their Class 7 results
 
