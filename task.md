@@ -1,6 +1,6 @@
 # Task Execution Record: Module 03 — Student Information System (SIS) & Student Lifecycle
 
-Execution of the `brd-to-api` skill for **Module 03** based on [`story/module3/School_ERP_Module_03_SIS_Lifecycle_1000.md`](../story/module3/School_ERP_Module_03_SIS_Lifecycle_1000.md), [`module3.sql`](../story/module3/module3.sql) and [`module3.md`](../story/module3/module3.md).
+Execution of the `BRD_API_Generate` skill for **Module 03** based on [`story/module3/School_ERP_Module_03_SIS_Lifecycle_1000.md`](../story/module3/School_ERP_Module_03_SIS_Lifecycle_1000.md), [`module3.sql`](../story/module3/module3.sql) and [`module3.md`](../story/module3/module3.md).
 
 ---
 
