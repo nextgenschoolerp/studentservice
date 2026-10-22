@@ -49,6 +49,7 @@ public class AlumniService {
         log.info("Archiving graduating student: {} into alumni registry", request.getStudentId());
         StudentMaster student = studentRepository.findByStudentId(request.getStudentId())
                 .orElseThrow(() -> new ResourceNotFoundException("StudentMaster", "studentId", request.getStudentId()));
+        tenantGuard.requireTenantRecord(student.getTenantId(), "StudentMaster", "studentId", request.getStudentId());
 
         if (alumniRepository.existsByStudentUid(student.getStudentUid())) {
             throw new ConflictException("Student " + student.getStudentUid() + " is already archived in the alumni registry");

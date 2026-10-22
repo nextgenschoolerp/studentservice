@@ -69,6 +69,8 @@ public class StudentService {
     @Transactional
     public StudentResponse enrollStudent(EnrollStudentRequest request) {
         log.info("Enrolling student: {} {} for tenant: {}", request.getFirstName(), request.getLastName(), request.getTenantId());
+        tenantGuard.requireTenant(request.getTenantId());
+        requirePlacement(request.getTenantId(), request.getGradeId(), request.getSectionId(), request.getHouseId());
 
         String studentUid = UidGenerator.generateStudentUid();
         while (studentRepository.existsByStudentUid(studentUid)) {
@@ -193,19 +195,13 @@ public class StudentService {
         log.info("Assigning student {} to grade {}, section {}, house {}", studentId, request.getGradeId(), request.getSectionId(), request.getHouseId());
         StudentMaster student = findStudent(studentId);
 
+        requirePlacement(student.getTenantId(), request.getGradeId(), request.getSectionId(), request.getHouseId());
         Grade grade = gradeRepository.findById(request.getGradeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Grade", "gradeId", request.getGradeId()));
-
         Section section = sectionRepository.findById(request.getSectionId())
                 .orElseThrow(() -> new ResourceNotFoundException("Section", "sectionId", request.getSectionId()));
 
-        if (!section.getGradeId().equals(grade.getGradeId())) {
-            throw new BadRequestException("Section " + section.getSectionName() + " does not belong to Grade " + grade.getGradeName());
-        }
-
         if (request.getHouseId() != null) {
-            houseRepository.findById(request.getHouseId())
-                    .orElseThrow(() -> new ResourceNotFoundException("House", "houseId", request.getHouseId()));
             student.setHouseId(request.getHouseId());
         }
 
@@ -321,6 +317,36 @@ public class StudentService {
                 .totalPromoted(studentsToPromote.size())
                 .status("SUCCESS")
                 .build();
+    }
+
+    /**
+     * Checks that a class, section and house named in a request belong to the student's tenant (another tenant's
+     * are reported as not found) and that the section is a section of the class. Null ids are skipped.
+     */
+    private void requirePlacement(String tenantId, UUID gradeId, UUID sectionId, UUID houseId) {
+        Grade grade = null;
+        if (gradeId != null) {
+            grade = gradeRepository.findById(gradeId)
+                    .filter(g -> g.getTenantId().equalsIgnoreCase(tenantId))
+                    .orElseThrow(() -> new ResourceNotFoundException("Grade", "gradeId", gradeId));
+        }
+        if (sectionId != null) {
+            Section section = sectionRepository.findById(sectionId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Section", "sectionId", sectionId));
+            Grade sectionGrade = grade != null && grade.getGradeId().equals(section.getGradeId()) ? grade
+                    : gradeRepository.findById(section.getGradeId()).orElse(null);
+            if (sectionGrade == null || !sectionGrade.getTenantId().equalsIgnoreCase(tenantId)) {
+                throw new ResourceNotFoundException("Section", "sectionId", sectionId);
+            }
+            if (grade != null && !section.getGradeId().equals(grade.getGradeId())) {
+                throw new BadRequestException("Section " + section.getSectionName() + " does not belong to Grade " + grade.getGradeName());
+            }
+        }
+        if (houseId != null) {
+            houseRepository.findById(houseId)
+                    .filter(h -> h.getTenantId().equalsIgnoreCase(tenantId))
+                    .orElseThrow(() -> new ResourceNotFoundException("House", "houseId", houseId));
+        }
     }
 
     /** Loads a student of the caller's tenant; another tenant's student is reported as not found. */

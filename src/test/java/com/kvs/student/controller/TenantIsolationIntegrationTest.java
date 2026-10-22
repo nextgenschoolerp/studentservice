@@ -2,16 +2,29 @@ package com.kvs.student.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kvs.core.service.JwtTokenService;
+import com.kvs.student.dto.ArchiveAlumniRequest;
+import com.kvs.student.dto.AssignSectionHouseRequest;
+import com.kvs.student.dto.BatchPromotionRequest;
+import com.kvs.student.dto.CreateGradeRequest;
+import com.kvs.student.dto.CreateHouseRequest;
+import com.kvs.student.dto.CreateSectionRequest;
+import com.kvs.student.dto.EnrollStudentRequest;
 import com.kvs.student.dto.IssueBonafideCertificateRequest;
 import com.kvs.student.dto.UpdateMedicalAlertsRequest;
 import com.kvs.student.entity.AlumniRecord;
 import com.kvs.student.entity.CertificateIssued;
+import com.kvs.student.entity.Grade;
+import com.kvs.student.entity.House;
+import com.kvs.student.entity.Section;
 import com.kvs.student.entity.StudentMaster;
 import com.kvs.student.enums.CertificateType;
 import com.kvs.student.enums.Gender;
 import com.kvs.student.enums.StudentStatus;
 import com.kvs.student.repo.AlumniRecordRepository;
 import com.kvs.student.repo.CertificateIssuedRepository;
+import com.kvs.student.repo.GradeRepository;
+import com.kvs.student.repo.HouseRepository;
+import com.kvs.student.repo.SectionRepository;
 import com.kvs.student.repo.StudentMasterRepository;
 import com.kvs.student.service.UidGenerator;
 import org.junit.jupiter.api.AfterEach;
@@ -29,13 +42,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * End-to-end (real services, H2) checks that a caller only reaches students of the tenant in their token,
+ * End-to-end (real services, H2) checks that a caller only reaches students, classes, sections and houses of the
+ * tenant in their token, including ids and tenants sent in request bodies,
  * that the school nurse can list students, and that certificate numbers skip numbers already issued.
  */
 @SpringBootTest
@@ -64,14 +79,39 @@ class TenantIsolationIntegrationTest {
     @Autowired
     private AlumniRecordRepository alumniRepository;
 
+    @Autowired
+    private GradeRepository gradeRepository;
+
+    @Autowired
+    private SectionRepository sectionRepository;
+
+    @Autowired
+    private HouseRepository houseRepository;
+
+    private Grade ownGrade;
+    private Grade ownNextGrade;
+    private Section ownSection;
+    private Grade otherGrade;
+    private Grade otherNextGrade;
+    private Section otherSection;
+    private House otherHouse;
     private StudentMaster ownStudent;
     private StudentMaster otherStudent;
     private AlumniRecord otherAlumni;
 
     @BeforeEach
     void setUp() {
+        ownGrade = gradeRepository.save(grade(OWN_TENANT, 6));
+        ownNextGrade = gradeRepository.save(grade(OWN_TENANT, 7));
+        ownSection = sectionRepository.save(Section.builder().gradeId(ownGrade.getGradeId()).sectionName("A").maxCapacity(40).build());
+        otherGrade = gradeRepository.save(grade(OTHER_TENANT, 6));
+        otherNextGrade = gradeRepository.save(grade(OTHER_TENANT, 7));
+        otherSection = sectionRepository.save(Section.builder().gradeId(otherGrade.getGradeId()).sectionName("A").maxCapacity(40).build());
+        otherHouse = houseRepository.save(House.builder().tenantId(OTHER_TENANT).houseName("Other House").build());
         ownStudent = studentRepository.save(student(OWN_TENANT, "Own"));
-        otherStudent = studentRepository.save(student(OTHER_TENANT, "Other"));
+        StudentMaster other = student(OTHER_TENANT, "Other");
+        other.setGradeId(otherGrade.getGradeId());
+        otherStudent = studentRepository.save(other);
         otherAlumni = alumniRepository.save(AlumniRecord.builder()
                 .studentId(otherStudent.getStudentId())
                 .tenantId(OTHER_TENANT)
@@ -89,6 +129,22 @@ class TenantIsolationIntegrationTest {
         certificateRepository.deleteAll();
         alumniRepository.deleteAll();
         studentRepository.deleteAll();
+        houseRepository.delete(otherHouse);
+        sectionRepository.deleteAll(List.of(ownSection, otherSection));
+        gradeRepository.deleteAll(List.of(ownGrade, ownNextGrade, otherGrade, otherNextGrade));
+    }
+
+    private static Grade grade(String tenantId, int order) {
+        return Grade.builder()
+                .tenantId(tenantId)
+                .gradeName("Class " + order)
+                .gradeCode("TEST-" + UUID.randomUUID().toString().substring(0, 8))
+                .sequenceOrder(order)
+                .build();
+    }
+
+    private String json(Object body) throws Exception {
+        return objectMapper.writeValueAsString(body);
     }
 
     private static StudentMaster student(String tenantId, String firstName) {
@@ -257,5 +313,140 @@ class TenantIsolationIntegrationTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.certificateNumber").value(String.format("%s%05d", stem, counter + 4)));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/students - enrolling into another tenant returns 403, another tenant's class or house 404")
+    void testEnroll_CrossTenant() throws Exception {
+        mockMvc.perform(post("/api/v1/students")
+                        .header("Authorization", token("REGISTRAR", OWN_TENANT))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(enrollment(OTHER_TENANT).build())))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(post("/api/v1/students")
+                        .header("Authorization", token("REGISTRAR", OWN_TENANT))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(enrollment(OWN_TENANT).gradeId(otherGrade.getGradeId()).build())))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(post("/api/v1/students")
+                        .header("Authorization", token("REGISTRAR", OWN_TENANT))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(enrollment(OWN_TENANT).houseId(otherHouse.getHouseId()).build())))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(post("/api/v1/students")
+                        .header("Authorization", token("REGISTRAR", OWN_TENANT))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(enrollment(OWN_TENANT)
+                                .gradeId(ownGrade.getGradeId()).sectionId(ownSection.getSectionId()).build())))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.tenantId").value(OWN_TENANT));
+    }
+
+    private static EnrollStudentRequest.EnrollStudentRequestBuilder enrollment(String tenantId) {
+        return EnrollStudentRequest.builder()
+                .tenantId(tenantId).branchId(BRANCH).firstName("New").lastName("Student")
+                .dateOfBirth(LocalDate.of(2015, 1, 1)).gender(Gender.MALE);
+    }
+
+    @Test
+    @DisplayName("PUT /api/v1/students/{id}/allocation - another tenant's class and section return 404")
+    void testAllocation_CrossTenantClassIsNotFound() throws Exception {
+        AssignSectionHouseRequest request = AssignSectionHouseRequest.builder()
+                .gradeId(otherGrade.getGradeId()).sectionId(otherSection.getSectionId()).build();
+        mockMvc.perform(put("/api/v1/students/{id}/allocation", ownStudent.getStudentId())
+                        .header("Authorization", token("REGISTRAR", OWN_TENANT))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(request)))
+                .andExpect(status().isNotFound());
+
+        assertThat(studentRepository.findById(ownStudent.getStudentId()).orElseThrow().getGradeId()).isNull();
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/alumni/archive - archiving another tenant's student returns 404 and leaves it unchanged")
+    void testArchive_CrossTenantIsNotFound() throws Exception {
+        ArchiveAlumniRequest request = ArchiveAlumniRequest.builder()
+                .studentId(otherStudent.getStudentId()).graduationYear(2026).finalGradePassed("Class 12").build();
+        mockMvc.perform(post("/api/v1/alumni/archive")
+                        .header("Authorization", token("REGISTRAR", OWN_TENANT))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(request)))
+                .andExpect(status().isNotFound());
+
+        assertThat(studentRepository.findById(otherStudent.getStudentId()).orElseThrow().getStudentStatus())
+                .isEqualTo(StudentStatus.ACTIVE);
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/academic/batch-promotion - another tenant's classes return 404")
+    void testBatchPromotion_CrossTenantIsNotFound() throws Exception {
+        BatchPromotionRequest request = BatchPromotionRequest.builder()
+                .currentAcademicYearId(UUID.randomUUID()).nextAcademicYearId(UUID.randomUUID())
+                .fromGradeId(otherGrade.getGradeId()).toGradeId(otherNextGrade.getGradeId()).build();
+        mockMvc.perform(post("/api/v1/academic/batch-promotion")
+                        .header("Authorization", token("REGISTRAR", OWN_TENANT))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(request)))
+                .andExpect(status().isNotFound());
+
+        assertThat(studentRepository.findById(otherStudent.getStudentId()).orElseThrow().getGradeId())
+                .isEqualTo(otherGrade.getGradeId());
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/academic/*?tenantId= - another tenant returns 403 (SUPER_ADMIN excepted); another tenant's sections 404")
+    void testAcademicLists_CrossTenant() throws Exception {
+        for (String path : List.of("/api/v1/academic/sessions", "/api/v1/academic/grades", "/api/v1/academic/houses")) {
+            mockMvc.perform(get(path).param("tenantId", OTHER_TENANT)
+                            .header("Authorization", token("REGISTRAR", OWN_TENANT)))
+                    .andExpect(status().isForbidden());
+            mockMvc.perform(get(path).param("tenantId", OWN_TENANT)
+                            .header("Authorization", token("REGISTRAR", OWN_TENANT)))
+                    .andExpect(status().isOk());
+        }
+
+        mockMvc.perform(get("/api/v1/academic/grades").param("tenantId", OTHER_TENANT)
+                        .header("Authorization", token("SUPER_ADMIN", OWN_TENANT)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/academic/sections").param("gradeId", otherGrade.getGradeId().toString())
+                        .header("Authorization", token("REGISTRAR", OWN_TENANT)))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/v1/academic/sections").param("gradeId", ownGrade.getGradeId().toString())
+                        .header("Authorization", token("REGISTRAR", OWN_TENANT)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(1));
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/academic/{grades,houses,sections} - creating for another tenant is refused")
+    void testAcademicCreates_CrossTenant() throws Exception {
+        CreateGradeRequest grade = CreateGradeRequest.builder()
+                .tenantId(OTHER_TENANT).gradeName("Class 13").gradeCode("TEST-X13").sequenceOrder(13).build();
+        mockMvc.perform(post("/api/v1/academic/grades")
+                        .header("Authorization", token("REGISTRAR", OWN_TENANT))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(grade)))
+                .andExpect(status().isForbidden());
+
+        CreateHouseRequest house = CreateHouseRequest.builder().tenantId(OTHER_TENANT).houseName("Intruder").build();
+        mockMvc.perform(post("/api/v1/academic/houses")
+                        .header("Authorization", token("REGISTRAR", OWN_TENANT))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(house)))
+                .andExpect(status().isForbidden());
+
+        CreateSectionRequest section = CreateSectionRequest.builder()
+                .gradeId(otherGrade.getGradeId()).sectionName("Z").build();
+        mockMvc.perform(post("/api/v1/academic/sections")
+                        .header("Authorization", token("REGISTRAR", OWN_TENANT))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(section)))
+                .andExpect(status().isNotFound());
+
+        assertThat(sectionRepository.findByGradeId(otherGrade.getGradeId())).hasSize(1);
     }
 }

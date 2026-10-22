@@ -12,7 +12,8 @@
 --     so transfer certificates can be signed off by two different people
 --   * DPS academic structure: sessions 2025-2026 / 2026-2027 (active), classes Nursery … Class 12
 --     (grade codes GRADE-NURSERY, GRADE-LKG, GRADE-UKG, GRADE-01 … GRADE-12, as admissionservice uses),
---     sections A–E of every class, houses Tagore / Raman / Shivaji / Ashoka
+--     sections A–E of every class, houses Tagore / Raman / Shivaji / Ashoka;
+--     terms 1–3 of 2026-2027 with half-terms (Term 1: 31 Aug – 18 Dec, half-term 26–30 Oct)
 --
 -- Story coverage (DPS North unless noted):
 --   US-03000 54 student master records with permanent UIDs (52 North, 2 South; 40 generated ones fill the pages)
@@ -45,6 +46,7 @@ DELETE FROM student_master          WHERE student_id::text     LIKE '5eed0003-%'
 DELETE FROM sections                WHERE section_id::text     LIKE '5eed0003-%';
 DELETE FROM grades                  WHERE grade_id::text       LIKE '5eed0003-%';
 DELETE FROM houses                  WHERE house_id::text       LIKE '5eed0003-%';
+DELETE FROM academic_terms          WHERE term_id::text        LIKE '5eed0003-%';
 DELETE FROM academic_sessions       WHERE academic_year_id::text LIKE '5eed0003-%';
 DELETE FROM user_roles              WHERE created_by = 'seed:module03';
 DELETE FROM user_credentials        WHERE created_by = 'seed:module03';
@@ -100,12 +102,23 @@ SELECT '5eed0001-0001-4000-8000-000000000023', 'VICE_PRINCIPAL', TIMESTAMPTZ '20
 -- ---------------------------------------------------------------------------------------------------
 -- 2. Academic structure (DPS)
 -- ---------------------------------------------------------------------------------------------------
-INSERT INTO academic_sessions (academic_year_id, tenant_id, session_name, start_date, end_date, is_active, created_at, updated_at, created_by, updated_by, version)
+INSERT INTO academic_sessions (academic_year_id, tenant_id, session_name, start_date, end_date, is_active, week_structure, created_at, updated_at, created_by, updated_by, version)
 VALUES
-('5eed0003-0001-4000-8000-000000000001', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', '2025-2026', DATE '2025-04-01', DATE '2026-03-31', false,
+('5eed0003-0001-4000-8000-000000000001', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', '2025-2026', DATE '2025-04-01', DATE '2026-03-31', false, 'MON_FRI',
  '2025-02-01 05:00:00+00', '2026-04-01 05:00:00+00', 'seed:module03', NULL, 0),
-('5eed0003-0001-4000-8000-000000000002', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', '2026-2027', DATE '2026-04-01', DATE '2027-03-31', true,
+('5eed0003-0001-4000-8000-000000000002', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', '2026-2027', DATE '2026-04-01', DATE '2027-03-31', true, 'MON_FRI',
  '2026-02-01 05:00:00+00', '2026-04-01 05:00:00+00', 'seed:module03', NULL, 0);
+
+-- Terms of 2026-2027 (Settings → Academic setup, Calendar → Term dates); Term 1 is current
+INSERT INTO academic_terms (term_id, tenant_id, academic_year_id, term_name, start_date, end_date, half_term_start, half_term_end,
+                            is_current, sort_order, created_at, updated_at, created_by, updated_by, version)
+VALUES
+('5eed0003-0011-4000-8000-000000000001', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000002', 'Term 1',
+ DATE '2026-08-31', DATE '2026-12-18', DATE '2026-10-26', DATE '2026-10-30', true, 1, '2026-04-01 05:00:00+00', NULL, 'seed:module03', NULL, 0),
+('5eed0003-0011-4000-8000-000000000002', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000002', 'Term 2',
+ DATE '2027-01-05', DATE '2027-03-26', DATE '2027-02-15', DATE '2027-02-19', false, 2, '2026-04-01 05:00:00+00', NULL, 'seed:module03', NULL, 0),
+('5eed0003-0011-4000-8000-000000000003', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000002', 'Term 3',
+ DATE '2027-04-12', DATE '2027-07-23', DATE '2027-05-31', DATE '2027-06-04', false, 3, '2026-04-01 05:00:00+00', NULL, 'seed:module03', NULL, 0);
 
 -- Grade ids: 5eed0003-0002-4000-8000-0000000000NN, NN = sequence order (01 Nursery … 15 Class 12)
 INSERT INTO grades (grade_id, tenant_id, grade_name, grade_code, sequence_order, created_at, updated_at, created_by, updated_by, version)

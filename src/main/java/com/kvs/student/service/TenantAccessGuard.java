@@ -64,7 +64,7 @@ public class TenantAccessGuard {
      */
     public void requireTenant(String tenantId) {
         if (!canAccessTenant(tenantId)) {
-            throw new ForbiddenException("You may only access students of your own institution");
+            throw new ForbiddenException("You may only access records of your own institution");
         }
     }
 

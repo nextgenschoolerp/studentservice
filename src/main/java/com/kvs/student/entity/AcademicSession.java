@@ -38,4 +38,9 @@ public class AcademicSession extends BaseAuditEntity {
     @Column(name = "is_active")
     @Builder.Default
     private Boolean isActive = false;
+
+    /** School days of the week: MON_FRI or MON_SAT (Settings → Academic setup) */
+    @Column(name = "week_structure", length = 10)
+    @Builder.Default
+    private String weekStructure = "MON_FRI";
 }

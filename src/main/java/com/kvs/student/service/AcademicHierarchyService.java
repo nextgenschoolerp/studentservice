@@ -2,6 +2,7 @@ package com.kvs.student.service;
 
 import com.kvs.core.exception.BadRequestException;
 import com.kvs.core.exception.ConflictException;
+import com.kvs.core.exception.ResourceNotFoundException;
 import com.kvs.student.dto.CreateAcademicSessionRequest;
 import com.kvs.student.dto.CreateGradeRequest;
 import com.kvs.student.dto.CreateHouseRequest;
@@ -41,8 +42,12 @@ public class AcademicHierarchyService {
     @Autowired
     private StudentAuditService auditService;
 
+    @Autowired
+    private TenantAccessGuard tenantGuard;
+
     @Transactional
     public AcademicSession createSession(CreateAcademicSessionRequest request) {
+        tenantGuard.requireTenant(request.getTenantId());
         if (sessionRepository.existsByTenantIdAndSessionName(request.getTenantId(), request.getSessionName())) {
             throw new ConflictException("Academic session " + request.getSessionName() + " already exists");
         }
@@ -65,11 +70,13 @@ public class AcademicHierarchyService {
 
     @Transactional(readOnly = true)
     public List<AcademicSession> listSessions(String tenantId) {
+        tenantGuard.requireTenant(tenantId);
         return sessionRepository.findByTenantId(tenantId);
     }
 
     @Transactional
     public Grade createGrade(CreateGradeRequest request) {
+        tenantGuard.requireTenant(request.getTenantId());
         if (gradeRepository.existsByTenantIdAndGradeCode(request.getTenantId(), request.getGradeCode())) {
             throw new ConflictException("Grade code " + request.getGradeCode() + " already exists");
         }
@@ -88,11 +95,13 @@ public class AcademicHierarchyService {
 
     @Transactional(readOnly = true)
     public List<Grade> listGrades(String tenantId) {
+        tenantGuard.requireTenant(tenantId);
         return gradeRepository.findByTenantIdOrderBySequenceOrderAsc(tenantId);
     }
 
     @Transactional
     public Section createSection(CreateSectionRequest request) {
+        findGrade(request.getGradeId());
         Section section = Section.builder()
                 .gradeId(request.getGradeId())
                 .sectionName(request.getSectionName())
@@ -106,11 +115,13 @@ public class AcademicHierarchyService {
 
     @Transactional(readOnly = true)
     public List<Section> listSections(UUID gradeId) {
+        findGrade(gradeId);
         return sectionRepository.findByGradeId(gradeId);
     }
 
     @Transactional
     public House createHouse(CreateHouseRequest request) {
+        tenantGuard.requireTenant(request.getTenantId());
         House house = House.builder()
                 .tenantId(request.getTenantId())
                 .houseName(request.getHouseName())
@@ -124,6 +135,15 @@ public class AcademicHierarchyService {
 
     @Transactional(readOnly = true)
     public List<House> listHouses(String tenantId) {
+        tenantGuard.requireTenant(tenantId);
         return houseRepository.findByTenantId(tenantId);
+    }
+
+    /** Loads a class of the caller's tenant; another tenant's class is reported as not found. */
+    private Grade findGrade(UUID gradeId) {
+        Grade grade = gradeRepository.findById(gradeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Grade", "gradeId", gradeId));
+        tenantGuard.requireTenantRecord(grade.getTenantId(), "Grade", "gradeId", gradeId);
+        return grade;
     }
 }
