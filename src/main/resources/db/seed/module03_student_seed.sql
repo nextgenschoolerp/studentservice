@@ -38,6 +38,12 @@ BEGIN;
 -- ---------------------------------------------------------------------------------------------------
 -- 0. Clean previous seed rows (children first)
 -- ---------------------------------------------------------------------------------------------------
+-- Uploaded student photos survive a re-run: the links are remembered here and put back after the students are re-created
+DROP TABLE IF EXISTS seed_photo_links;
+CREATE TEMP TABLE seed_photo_links AS
+SELECT student_id, profile_photo_url FROM student_master
+ WHERE student_id::text LIKE '5eed0003-%' AND profile_photo_url IS NOT NULL;
+
 DELETE FROM alumni_records          WHERE alumni_id::text      LIKE '5eed0003-%';
 DELETE FROM disciplinary_incidents  WHERE incident_id::text    LIKE '5eed0003-%';
 DELETE FROM certificates_issued     WHERE certificate_id::text LIKE '5eed0003-%';
@@ -204,6 +210,33 @@ SELECT ('5eed0003-0005-4000-8000-0000000000' || lpad(s.n::text, 2, '0'))::uuid, 
        s.roll, s.status, s.parent, 'BC-' || s.uid, 'https://verify.kvs.local/students/' || s.uid, NULL,
        s.created_at, GREATEST(s.created_at, TIMESTAMPTZ '2026-04-01 05:00:00+00'), 'seed:module03', NULL, 0
 FROM seed_students s;
+
+-- Personal, admission and allergy fields (Module 03 profile upgrade)
+-- Personal, admission, contact and allergy fields (columns from db/upgrade/module03_student_profile_allergies.sql).
+-- Allergy text moves out of the medical alerts into its own column, as the upgrade does for existing rows.
+UPDATE student_master
+   SET allergies = medical_alerts, medical_alerts = 'None'
+ WHERE tenant_id = 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+   AND student_id::text LIKE '5eed0003-%' AND medical_alerts ILIKE '%allerg%';
+
+UPDATE student_master
+   SET nationality = 'Indian',
+       admission_date = created_at::date,
+       admission_number = 'ADM-' || student_uid,
+       collection_permission = 'Both guardians authorised'
+ WHERE student_id::text LIKE '5eed0003-%';
+
+UPDATE student_master
+   SET medication_instructions = 'Salbutamol inhaler held at the school office',
+       gp_contact = 'Willow Medical Centre, +91 11 4000 1000'
+ WHERE student_id::text LIKE '5eed0003-%' AND medical_alerts ILIKE '%asthma%';
+
+-- Put the remembered photo links back (the files live in studentservice/student-vault)
+UPDATE student_master m
+   SET profile_photo_url = l.profile_photo_url
+  FROM seed_photo_links l
+ WHERE m.student_id = l.student_id;
+DROP TABLE IF EXISTS seed_photo_links;
 
 -- One primary guardian per student; Kabir and Zara also have a second (emergency) contact
 INSERT INTO student_guardians (guardian_id, student_id, full_name, relationship, mobile_number, email, is_primary_contact,

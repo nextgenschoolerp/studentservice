@@ -94,6 +94,31 @@ public class StudentMaster extends BaseAuditEntity {
     @Column(name = "residential_address", length = 500)
     private String residentialAddress;
 
+    @Column(name = "preferred_name", length = 100)
+    private String preferredName;
+
+    @Column(name = "nationality", length = 60)
+    private String nationality;
+
+    @Column(name = "admission_date")
+    private LocalDate admissionDate;
+
+    @Column(name = "admission_number", length = 50)
+    private String admissionNumber;
+
+    /** Allergies, kept apart from medicalAlerts (conditions). */
+    @Column(name = "allergies", length = 500)
+    private String allergies;
+
+    @Column(name = "medication_instructions", length = 500)
+    private String medicationInstructions;
+
+    @Column(name = "gp_contact", length = 255)
+    private String gpContact;
+
+    @Column(name = "collection_permission", length = 60)
+    private String collectionPermission;
+
     @Column(name = "transport_route_id", length = 100)
     private String transportRouteId;
 

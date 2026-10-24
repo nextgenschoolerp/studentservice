@@ -20,4 +20,7 @@ public class UpdateMedicalAlertsRequest {
 
     @NotBlank(message = "emergencyContactPhone is required")
     private String emergencyContactPhone;
+
+    /** Allergies on their own (optional; blank when there are none). */
+    private String allergies;
 }

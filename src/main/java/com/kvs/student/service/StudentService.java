@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -153,12 +154,83 @@ public class StudentService {
         student.setBloodGroup(request.getBloodGroup());
         student.setMedicalAlerts(request.getMedicalAlerts());
         student.setEmergencyContactPhone(request.getEmergencyContactPhone());
+        student.setAllergies(blankToNull(request.getAllergies()));
 
         StudentMaster saved = studentRepository.save(student);
         auditService.logSuccess("student:" + studentId, "UPDATE_MEDICAL_ALERTS",
                 "Updated blood group to " + request.getBloodGroup() + " and emergency contact to " + request.getEmergencyContactPhone());
 
         return mapToResponse(saved);
+    }
+
+    /**
+     * Personal and contact details of the student: name, date of birth, gender, admission details, nationality, address,
+     * medication and GP contact, and collection permission. Blank optional fields are cleared.
+     */
+    @Transactional
+    public StudentResponse updateProfile(UUID studentId, UpdateStudentProfileRequest request) {
+        log.info("Updating profile details for student: {}", studentId);
+        StudentMaster student = findStudent(studentId);
+
+        student.setFirstName(request.getFirstName().trim());
+        student.setLastName(request.getLastName().trim());
+        student.setPreferredName(blankToNull(request.getPreferredName()));
+        student.setDateOfBirth(request.getDateOfBirth());
+        student.setGender(request.getGender());
+        student.setNationality(blankToNull(request.getNationality()));
+        student.setAdmissionDate(request.getAdmissionDate());
+        student.setAdmissionNumber(blankToNull(request.getAdmissionNumber()));
+        student.setResidentialAddress(blankToNull(request.getResidentialAddress()));
+        student.setMedicationInstructions(blankToNull(request.getMedicationInstructions()));
+        student.setGpContact(blankToNull(request.getGpContact()));
+        student.setCollectionPermission(blankToNull(request.getCollectionPermission()));
+
+        StudentMaster saved = studentRepository.save(student);
+        auditService.logSuccess("student:" + studentId, "UPDATE_STUDENT_PROFILE",
+                "Updated profile details for " + saved.getFirstName() + " " + saved.getLastName());
+        return mapToResponse(saved);
+    }
+
+    /**
+     * Replaces the student's guardians with the list sent: guardians listed with a guardianId are updated in place,
+     * new ones are added, and guardians not in the list are removed. When no guardian is marked primary, the first becomes primary.
+     */
+    @Transactional
+    public StudentResponse updateGuardians(UUID studentId, UpdateGuardiansRequest request) {
+        log.info("Updating guardians for student: {}", studentId);
+        StudentMaster student = findStudent(studentId);
+
+        List<StudentGuardian> existing = guardianRepository.findByStudentId(studentId);
+        Map<UUID, StudentGuardian> byId = new HashMap<>();
+        existing.forEach(g -> byId.put(g.getGuardianId(), g));
+
+        List<UpdateGuardiansRequest.Item> items = request.getGuardians();
+        boolean anyPrimary = items.stream().anyMatch(i -> Boolean.TRUE.equals(i.getPrimaryContact()));
+        List<UUID> kept = new ArrayList<>();
+        for (int i = 0; i < items.size(); i++) {
+            UpdateGuardiansRequest.Item item = items.get(i);
+            StudentGuardian guardian = item.getGuardianId() != null ? byId.get(item.getGuardianId()) : null;
+            if (guardian == null) {
+                guardian = StudentGuardian.builder().studentId(studentId).build();
+            }
+            guardian.setFullName(item.getFullName().trim());
+            guardian.setRelationship(item.getRelationship().trim());
+            guardian.setMobileNumber(item.getMobileNumber() == null ? "" : item.getMobileNumber().trim());
+            guardian.setEmail(blankToNull(item.getEmail()));
+            guardian.setIsPrimaryContact(anyPrimary ? Boolean.TRUE.equals(item.getPrimaryContact()) : i == 0);
+            kept.add(guardianRepository.save(guardian).getGuardianId());
+        }
+
+        List<StudentGuardian> removed = existing.stream().filter(g -> !kept.contains(g.getGuardianId())).toList();
+        guardianRepository.deleteAll(removed);
+
+        auditService.logSuccess("student:" + studentId, "UPDATE_GUARDIANS",
+                "Saved " + kept.size() + " guardian(s) for " + student.getFirstName() + " " + student.getLastName());
+        return mapToResponse(student);
+    }
+
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 
     /**
@@ -807,6 +879,14 @@ public class StudentService {
                 .idCardQrCode(student.getIdCardQrCode())
                 .profilePhotoUrl(student.getProfilePhotoUrl())
                 .residentialAddress(student.getResidentialAddress())
+                .preferredName(student.getPreferredName())
+                .nationality(student.getNationality())
+                .admissionDate(student.getAdmissionDate())
+                .admissionNumber(student.getAdmissionNumber())
+                .allergies(student.getAllergies())
+                .medicationInstructions(student.getMedicationInstructions())
+                .gpContact(student.getGpContact())
+                .collectionPermission(student.getCollectionPermission())
                 .transportRouteId(student.getTransportRouteId())
                 .isOnHold(student.getIsOnHold())
                 .activeHoldReason(student.getActiveHoldReason())

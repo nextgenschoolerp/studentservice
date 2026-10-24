@@ -41,6 +41,14 @@ public class StudentResponse {
     private String idCardQrCode;
     private String profilePhotoUrl;
     private String residentialAddress;
+    private String preferredName;
+    private String nationality;
+    private LocalDate admissionDate;
+    private String admissionNumber;
+    private String allergies;
+    private String medicationInstructions;
+    private String gpContact;
+    private String collectionPermission;
     private String transportRouteId;
     private Boolean isOnHold;
     private String activeHoldReason;

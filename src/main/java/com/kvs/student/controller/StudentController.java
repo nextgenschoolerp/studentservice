@@ -97,6 +97,32 @@ public class StudentController {
     }
 
     /**
+     * Personal and contact details of the student (name, date of birth, admission details, address, medication, GP, collection)
+     */
+    @PutMapping("/{studentId}/profile")
+    @PreAuthorize("hasAnyRole('REGISTRAR', 'OFFICE_CLERK', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_REGISTRAR', 'ROLE_OFFICE_CLERK', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<StudentResponse>> updateProfile(
+            @PathVariable("studentId") UUID studentId,
+            @Valid @RequestBody UpdateStudentProfileRequest request) {
+        log.info("Request to update profile details for student: {}", studentId);
+        StudentResponse response = studentService.updateProfile(studentId, request);
+        return ResponseEntity.ok(ApiResponse.success("Student profile updated successfully", response));
+    }
+
+    /**
+     * Guardians and their contact details: the list sent replaces the student's guardians
+     */
+    @PutMapping("/{studentId}/guardians")
+    @PreAuthorize("hasAnyRole('REGISTRAR', 'OFFICE_CLERK', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_REGISTRAR', 'ROLE_OFFICE_CLERK', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<StudentResponse>> updateGuardians(
+            @PathVariable("studentId") UUID studentId,
+            @Valid @RequestBody UpdateGuardiansRequest request) {
+        log.info("Request to update guardians for student: {}", studentId);
+        StudentResponse response = studentService.updateGuardians(studentId, request);
+        return ResponseEntity.ok(ApiResponse.success("Student guardians updated successfully", response));
+    }
+
+    /**
      * US-03002: Link multi-sibling profiles under a single consolidated parent user account
      */
     @PostMapping("/{studentId}/siblings")
