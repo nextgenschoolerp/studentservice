@@ -15,7 +15,7 @@ spring:
       max-file-size: 10MB
       max-request-size: 11MB
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/authservice}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/datasource}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
