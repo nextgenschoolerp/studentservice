@@ -4,7 +4,7 @@
 --             start studentservice once before running this script)
 --
 -- Tenants, branches and users match the authservice seed (module01_auth_seed.sql):
---   a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11  Delhi Public Education Society  (DPS-DELHI-NORTH, DPS-DELHI-SOUTH)
+--   a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11  Delhi Public Education Society  (DPS-DELHI-NORTH, DPS-DELHI-SOUTH)
 --
 -- Adds:
 --   * the Module 03 roles (SCHOOL_NURSE, OFFICE_CLERK, CLASS_TEACHER, HOUSE_MASTER, VICE_PRINCIPAL,
@@ -85,7 +85,7 @@ INSERT INTO seed_staff VALUES
 
 INSERT INTO users (user_id, tenant_id, branch_id, username, first_name, last_name, email, phone_number, user_type, is_active, is_mfa_enabled,
                    created_at, updated_at, created_by, updated_by, version)
-SELECT user_id, 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'DPS-DELHI-NORTH', username, first_name, last_name, email, phone, user_type, true, false,
+SELECT user_id, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'DPS-DELHI-NORTH', username, first_name, last_name, email, phone, user_type, true, false,
        created_at, created_at, 'seed:module03', NULL, 0
 FROM seed_staff;
 
@@ -110,25 +110,25 @@ SELECT '5eed0001-0001-4000-8000-000000000023', 'VICE_PRINCIPAL', TIMESTAMPTZ '20
 -- ---------------------------------------------------------------------------------------------------
 INSERT INTO academic_sessions (academic_year_id, tenant_id, session_name, start_date, end_date, is_active, week_structure, created_at, updated_at, created_by, updated_by, version)
 VALUES
-('5eed0003-0001-4000-8000-000000000001', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', '2025-2026', DATE '2025-04-01', DATE '2026-03-31', false, 'MON_FRI',
+('5eed0003-0001-4000-8000-000000000001', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '2025-2026', DATE '2025-04-01', DATE '2026-03-31', false, 'MON_FRI',
  '2025-02-01 05:00:00+00', '2026-04-01 05:00:00+00', 'seed:module03', NULL, 0),
-('5eed0003-0001-4000-8000-000000000002', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', '2026-2027', DATE '2026-04-01', DATE '2027-03-31', true, 'MON_FRI',
+('5eed0003-0001-4000-8000-000000000002', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '2026-2027', DATE '2026-04-01', DATE '2027-03-31', true, 'MON_FRI',
  '2026-02-01 05:00:00+00', '2026-04-01 05:00:00+00', 'seed:module03', NULL, 0);
 
 -- Terms of 2026-2027 (Settings → Academic setup, Calendar → Term dates); Term 1 is current
 INSERT INTO academic_terms (term_id, tenant_id, academic_year_id, term_name, start_date, end_date, half_term_start, half_term_end,
                             is_current, sort_order, created_at, updated_at, created_by, updated_by, version)
 VALUES
-('5eed0003-0011-4000-8000-000000000001', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000002', 'Term 1',
+('5eed0003-0011-4000-8000-000000000001', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000002', 'Term 1',
  DATE '2026-08-31', DATE '2026-12-18', DATE '2026-10-26', DATE '2026-10-30', true, 1, '2026-04-01 05:00:00+00', NULL, 'seed:module03', NULL, 0),
-('5eed0003-0011-4000-8000-000000000002', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000002', 'Term 2',
+('5eed0003-0011-4000-8000-000000000002', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000002', 'Term 2',
  DATE '2027-01-05', DATE '2027-03-26', DATE '2027-02-15', DATE '2027-02-19', false, 2, '2026-04-01 05:00:00+00', NULL, 'seed:module03', NULL, 0),
-('5eed0003-0011-4000-8000-000000000003', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000002', 'Term 3',
+('5eed0003-0011-4000-8000-000000000003', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000002', 'Term 3',
  DATE '2027-04-12', DATE '2027-07-23', DATE '2027-05-31', DATE '2027-06-04', false, 3, '2026-04-01 05:00:00+00', NULL, 'seed:module03', NULL, 0);
 
 -- Grade ids: 5eed0003-0002-4000-8000-0000000000NN, NN = sequence order (01 Nursery … 15 Class 12)
 INSERT INTO grades (grade_id, tenant_id, grade_name, grade_code, sequence_order, created_at, updated_at, created_by, updated_by, version)
-SELECT ('5eed0003-0002-4000-8000-0000000000' || lpad(g.seq::text, 2, '0'))::uuid, 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', g.name, g.code, g.seq,
+SELECT ('5eed0003-0002-4000-8000-0000000000' || lpad(g.seq::text, 2, '0'))::uuid, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', g.name, g.code, g.seq,
        TIMESTAMPTZ '2026-02-01 05:00:00+00', TIMESTAMPTZ '2026-02-01 05:00:00+00', 'seed:module03', NULL, 0
 FROM (SELECT 1 AS seq, 'Nursery' AS name, 'GRADE-NURSERY' AS code UNION ALL SELECT 2, 'LKG', 'GRADE-LKG' UNION ALL SELECT 3, 'UKG', 'GRADE-UKG'
       UNION ALL SELECT n + 3, 'Class ' || n, 'GRADE-' || lpad(n::text, 2, '0') FROM generate_series(1, 12) AS n) AS g;
@@ -143,10 +143,10 @@ CROSS JOIN (VALUES (1, 'A'), (2, 'B'), (3, 'C'), (4, 'D'), (5, 'E')) AS s(idx, n
 
 INSERT INTO houses (house_id, tenant_id, house_name, color_hex, created_at, updated_at, created_by, updated_by, version)
 VALUES
-('5eed0003-0004-4000-8000-000000000001', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Tagore',  '#1E88E5', '2026-02-01 05:00:00+00', '2026-02-01 05:00:00+00', 'seed:module03', NULL, 0),
-('5eed0003-0004-4000-8000-000000000002', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Raman',   '#E53935', '2026-02-01 05:00:00+00', '2026-02-01 05:00:00+00', 'seed:module03', NULL, 0),
-('5eed0003-0004-4000-8000-000000000003', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Shivaji', '#43A047', '2026-02-01 05:00:00+00', '2026-02-01 05:00:00+00', 'seed:module03', NULL, 0),
-('5eed0003-0004-4000-8000-000000000004', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Ashoka',  '#FDD835', '2026-02-01 05:00:00+00', '2026-02-01 05:00:00+00', 'seed:module03', NULL, 0);
+('5eed0003-0004-4000-8000-000000000001', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Tagore',  '#1E88E5', '2026-02-01 05:00:00+00', '2026-02-01 05:00:00+00', 'seed:module03', NULL, 0),
+('5eed0003-0004-4000-8000-000000000002', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Raman',   '#E53935', '2026-02-01 05:00:00+00', '2026-02-01 05:00:00+00', 'seed:module03', NULL, 0),
+('5eed0003-0004-4000-8000-000000000003', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Shivaji', '#43A047', '2026-02-01 05:00:00+00', '2026-02-01 05:00:00+00', 'seed:module03', NULL, 0),
+('5eed0003-0004-4000-8000-000000000004', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Ashoka',  '#FDD835', '2026-02-01 05:00:00+00', '2026-02-01 05:00:00+00', 'seed:module03', NULL, 0);
 
 -- ---------------------------------------------------------------------------------------------------
 -- 3. US-03000 – US-03004 Students (grade = sequence order, section 1-5 = A-E, house 1-4)
@@ -202,7 +202,7 @@ INSERT INTO student_master (student_id, tenant_id, branch_id, student_uid, first
                             medical_alerts, emergency_contact_phone, grade_id, section_id, house_id, roll_number, student_status,
                             parent_account_id, id_card_barcode, id_card_qr_code, profile_photo_url,
                             created_at, updated_at, created_by, updated_by, version)
-SELECT ('5eed0003-0005-4000-8000-0000000000' || lpad(s.n::text, 2, '0'))::uuid, 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', s.branch, s.uid,
+SELECT ('5eed0003-0005-4000-8000-0000000000' || lpad(s.n::text, 2, '0'))::uuid, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', s.branch, s.uid,
        s.first_name, s.last_name, s.dob, s.gender, s.blood, s.alerts, s.emergency,
        ('5eed0003-0002-4000-8000-0000000000' || lpad(s.grade::text, 2, '0'))::uuid,
        ('5eed0003-0003-4000-8000-000000000' || lpad(s.grade::text, 2, '0') || s.section)::uuid,
@@ -216,7 +216,7 @@ FROM seed_students s;
 -- Allergy text moves out of the medical alerts into its own column, as the upgrade does for existing rows.
 UPDATE student_master
    SET allergies = medical_alerts, medical_alerts = 'None'
- WHERE tenant_id = 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+ WHERE tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
    AND student_id::text LIKE '5eed0003-%' AND medical_alerts ILIKE '%allerg%';
 
 UPDATE student_master
@@ -290,7 +290,7 @@ INSERT INTO alumni_records (alumni_id, student_id, tenant_id, branch_id, student
                             alumni_email, alumni_phone, higher_education_institution, current_occupation, archived_date,
                             created_at, updated_at, created_by, updated_by, version)
 VALUES
-('5eed0003-0009-4000-8000-000000000001', '5eed0003-0005-4000-8000-000000000012', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'DPS-DELHI-NORTH',
+('5eed0003-0009-4000-8000-000000000001', '5eed0003-0005-4000-8000-000000000012', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'DPS-DELHI-NORTH',
  'STU-2013-00002', 'Nikhil Bose', 2026, 'Class 12', 'nikhil.bose@alumni.dps.edu.in', '+919811234612', 'IIT Delhi', 'B.Tech student',
  DATE '2026-06-30', '2026-06-30 06:00:00+00', '2026-06-30 06:00:00+00', 'seed:module03', NULL, 0);
 

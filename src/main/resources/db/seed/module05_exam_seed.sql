@@ -71,7 +71,7 @@ INSERT INTO seed_staff VALUES
 
 INSERT INTO users (user_id, tenant_id, branch_id, username, first_name, last_name, email, phone_number, user_type, is_active, is_mfa_enabled,
                    created_at, updated_at, created_by, updated_by, version)
-SELECT user_id, 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'DPS-DELHI-NORTH', username, first_name, last_name, email, phone, user_type, true, false,
+SELECT user_id, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'DPS-DELHI-NORTH', username, first_name, last_name, email, phone, user_type, true, false,
        created_at, created_at, 'seed:module05', NULL, 0
 FROM seed_staff;
 
@@ -89,7 +89,7 @@ SELECT user_id, user_type, created_at, created_at, 'seed:module05', NULL, 0 FROM
 -- 2. Grading scale and terms (US-05000, US-05005)
 -- ---------------------------------------------------------------------------------------------------
 INSERT INTO grading_scales (grading_scale_id, tenant_id, scale_name, pass_percent, created_at, updated_at, created_by, updated_by, version)
-VALUES ('5eed0005-0001-4000-8000-000000000001', 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'CBSE 9-point', 33.00,
+VALUES ('5eed0005-0001-4000-8000-000000000001', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'CBSE 9-point', 33.00,
         TIMESTAMPTZ '2026-03-12 05:00:00+00', TIMESTAMPTZ '2026-03-12 05:00:00+00', 'seed:module05', NULL, 0);
 
 INSERT INTO grading_scale_bands (grading_scale_id, grade_label, min_percent, grade_point, description)
@@ -100,7 +100,7 @@ FROM (VALUES ('A1', 91, 10.0, 'Outstanding'), ('A2', 81, 9.0, 'Excellent'), ('B1
 
 INSERT INTO exam_terms (exam_term_id, tenant_id, academic_year_id, term_name, term_type, weightage_percent, start_date, end_date,
                         mark_entry_deadline, locked_at, grading_scale_id, created_at, updated_at, created_by, updated_by, version)
-SELECT ('5eed0005-0002-4000-8000-00000000000' || t.n)::uuid, 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000002',
+SELECT ('5eed0005-0002-4000-8000-00000000000' || t.n)::uuid, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000002',
        t.name, t.type, t.weight, t.start::date, t.finish::date, t.deadline::timestamptz, t.locked::timestamptz,
        '5eed0005-0001-4000-8000-000000000001', TIMESTAMPTZ '2026-03-15 05:00:00+00', TIMESTAMPTZ '2026-03-15 05:00:00+00', 'seed:module05', NULL, 0
 FROM (VALUES
@@ -149,7 +149,7 @@ SELECT s.student_id, s.student_uid, s.section_id, sub.term_no, sub.term_id, sub.
            + CASE WHEN sub.term_no = '2' THEN (abs(hashtext(s.student_uid || 'trend')) % 15) - 6 ELSE 0 END)) AS pct
 FROM student_master s
 JOIN seed_subject sub ON sub.grade_id = s.grade_id AND sub.term_no IN ('1', '2')
-WHERE s.tenant_id = 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND s.student_status = 'ACTIVE' AND s.section_id IS NOT NULL
+WHERE s.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND s.student_status = 'ACTIVE' AND s.section_id IS NOT NULL
   -- Riya Bansal's Half-Yearly Science is still missing (US-05016)
   AND NOT (s.student_uid = 'STU-2024-00242' AND sub.term_no = '2' AND sub.code = 'SCI');
 
@@ -188,7 +188,7 @@ SELECT ('5eed0005-' || substr(h, 1, 4) || '-4' || substr(h, 6, 3) || '-8' || sub
 FROM (SELECT s.student_id, s.student_uid, a.area, md5(s.student_id::text || a.area || 'cs') AS h
       FROM student_master s
       CROSS JOIN (VALUES ('ART_EDUCATION'), ('HEALTH_AND_PHYSICAL_EDUCATION'), ('WORK_EDUCATION'), ('VALUE_EDUCATION'), ('DISCIPLINE')) AS a(area)
-      WHERE s.tenant_id = 'a0eEBc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND s.student_status = 'ACTIVE'
+      WHERE s.tenant_id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AND s.student_status = 'ACTIVE'
         AND s.section_id IN ('5eed0003-0003-4000-8000-000000000091', '5eed0003-0003-4000-8000-000000000101')) x;   -- 6-A, 7-A
 
 -- Progress cards: Periodic Test 1 published for everyone; Half-Yearly published for Class 6-A with class teacher remarks
