@@ -3,6 +3,7 @@ package com.kvs.student.service;
 import com.kvs.core.exception.BadRequestException;
 import com.kvs.core.exception.ConflictException;
 import com.kvs.core.exception.ResourceNotFoundException;
+import com.kvs.student.dto.AssignClassTeacherRequest;
 import com.kvs.student.dto.CreateAcademicSessionRequest;
 import com.kvs.student.dto.CreateGradeRequest;
 import com.kvs.student.dto.CreateHouseRequest;
@@ -117,6 +118,18 @@ public class AcademicHierarchyService {
     public List<Section> listSections(UUID gradeId) {
         findGrade(gradeId);
         return sectionRepository.findByGradeId(gradeId);
+    }
+
+    @Transactional
+    public Section assignClassTeacher(UUID sectionId, AssignClassTeacherRequest request) {
+        Section section = sectionRepository.findById(sectionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Section not found: " + sectionId));
+        section.setClassTeacherId(request.getStaffId());
+        section.setClassTeacherName(request.getStaffName().trim());
+        Section saved = sectionRepository.save(section);
+        auditService.logSuccess("section:" + saved.getSectionId(), "ASSIGN_CLASS_TEACHER",
+                "Class teacher of section " + saved.getSectionName() + " set to " + saved.getClassTeacherName());
+        return saved;
     }
 
     @Transactional

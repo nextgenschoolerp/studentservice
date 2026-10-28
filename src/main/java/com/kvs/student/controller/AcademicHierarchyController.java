@@ -99,6 +99,18 @@ public class AcademicHierarchyController {
     }
 
     /**
+     * Set the class teacher (form tutor) of a section
+     */
+    @PatchMapping("/sections/{sectionId}/class-teacher")
+    @PreAuthorize("hasAnyRole('REGISTRAR', 'SCHOOL_PRINCIPAL', 'VICE_PRINCIPAL', 'SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<Section>> assignClassTeacher(
+            @PathVariable("sectionId") UUID sectionId,
+            @Valid @RequestBody AssignClassTeacherRequest request) {
+        Section section = academicService.assignClassTeacher(sectionId, request);
+        return ResponseEntity.ok(ApiResponse.success("Class teacher assigned", section));
+    }
+
+    /**
      * List sections for grade
      */
     @GetMapping("/sections")

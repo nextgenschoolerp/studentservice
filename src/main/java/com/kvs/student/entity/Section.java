@@ -31,4 +31,11 @@ public class Section extends BaseAuditEntity {
     @Column(name = "max_capacity")
     @Builder.Default
     private Integer maxCapacity = 40;
+
+    /** The class teacher (form tutor): an hrservice staff record, with the name kept here so lists need no cross-service call. */
+    @Column(name = "class_teacher_id")
+    private UUID classTeacherId;
+
+    @Column(name = "class_teacher_name", length = 150)
+    private String classTeacherName;
 }

@@ -115,6 +115,12 @@ VALUES
 ('5eed0003-0001-4000-8000-000000000002', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '2026-2027', DATE '2026-04-01', DATE '2027-03-31', true, 'MON_FRI',
  '2026-02-01 05:00:00+00', '2026-04-01 05:00:00+00', 'seed:module03', NULL, 0);
 
+-- Next academic year, so the session picker and Settings → Academic setup list 2025-2026, 2026-2027 and 2027-2028
+INSERT INTO academic_sessions (academic_year_id, tenant_id, session_name, start_date, end_date, is_active, week_structure, created_at, updated_at, created_by, updated_by, version)
+VALUES
+('5eed0003-0001-4000-8000-000000000003', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '2027-2028', DATE '2027-04-01', DATE '2028-03-31', false, 'MON_FRI',
+ '2026-02-01 05:00:00+00', '2026-04-01 05:00:00+00', 'seed:module03', NULL, 0);
+
 -- Terms of 2026-2027 (Settings → Academic setup, Calendar → Term dates); Term 1 is current
 INSERT INTO academic_terms (term_id, tenant_id, academic_year_id, term_name, start_date, end_date, half_term_start, half_term_end,
                             is_current, sort_order, created_at, updated_at, created_by, updated_by, version)
@@ -125,6 +131,19 @@ VALUES
  DATE '2027-01-05', DATE '2027-03-26', DATE '2027-02-15', DATE '2027-02-19', false, 2, '2026-04-01 05:00:00+00', NULL, 'seed:module03', NULL, 0),
 ('5eed0003-0011-4000-8000-000000000003', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000002', 'Term 3',
  DATE '2027-04-12', DATE '2027-07-23', DATE '2027-05-31', DATE '2027-06-04', false, 3, '2026-04-01 05:00:00+00', NULL, 'seed:module03', NULL, 0);
+
+-- Terms of 2025-2026 (completed) and 2027-2028 (not started); none is current
+INSERT INTO academic_terms (term_id, tenant_id, academic_year_id, term_name, start_date, end_date, half_term_start, half_term_end,
+                            is_current, sort_order, created_at, updated_at, created_by, updated_by, version)
+VALUES
+('5eed0003-0011-4000-8000-000000000004', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000001', 'Term 1',
+ DATE '2025-08-25', DATE '2025-12-19', DATE '2025-10-20', DATE '2025-10-24', false, 1, '2026-04-01 05:00:00+00', NULL, 'seed:module03', NULL, 0),
+('5eed0003-0011-4000-8000-000000000005', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000001', 'Term 2',
+ DATE '2026-01-05', DATE '2026-03-27', DATE '2026-02-16', DATE '2026-02-20', false, 2, '2026-04-01 05:00:00+00', NULL, 'seed:module03', NULL, 0),
+('5eed0003-0011-4000-8000-000000000006', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000003', 'Term 1',
+ DATE '2027-08-30', DATE '2027-12-17', DATE '2027-10-25', DATE '2027-10-29', false, 1, '2026-04-01 05:00:00+00', NULL, 'seed:module03', NULL, 0),
+('5eed0003-0011-4000-8000-000000000007', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '5eed0003-0001-4000-8000-000000000003', 'Term 2',
+ DATE '2028-01-04', DATE '2028-03-24', DATE '2028-02-14', DATE '2028-02-18', false, 2, '2026-04-01 05:00:00+00', NULL, 'seed:module03', NULL, 0);
 
 -- Grade ids: 5eed0003-0002-4000-8000-0000000000NN, NN = sequence order (01 Nursery … 15 Class 12)
 INSERT INTO grades (grade_id, tenant_id, grade_name, grade_code, sequence_order, created_at, updated_at, created_by, updated_by, version)
@@ -140,6 +159,22 @@ SELECT ('5eed0003-0003-4000-8000-000000000' || lpad(g.seq::text, 2, '0') || s.id
        TIMESTAMPTZ '2026-02-01 05:00:00+00', TIMESTAMPTZ '2026-02-01 05:00:00+00', 'seed:module03', NULL, 0
 FROM generate_series(1, 15) AS g(seq)
 CROSS JOIN (VALUES (1, 'A'), (2, 'B'), (3, 'C'), (4, 'D'), (5, 'E')) AS s(idx, name);
+
+-- Class teachers (form tutors) of the sections that have students: hrservice staff ids (module 07 seed) and their names
+UPDATE sections s
+   SET class_teacher_id = v.staff::uuid, class_teacher_name = v.name
+  FROM (VALUES
+    ('5eed0003-0003-4000-8000-000000000041', '5eed0007-0001-4000-8000-000000000026', 'Priya Nair'),
+    ('5eed0003-0003-4000-8000-000000000052', '5eed0007-0001-4000-8000-000000000043', 'Arjun Mehta'),
+    ('5eed0003-0003-4000-8000-000000000063', '5eed0007-0001-4000-8000-000000000041', 'Imran Siddiqui'),
+    ('5eed0003-0003-4000-8000-000000000071', '5eed0007-0001-4000-8000-000000000040', 'Kavya Pillai'),
+    ('5eed0003-0003-4000-8000-000000000091', '5eed0007-0001-4000-8000-000000000034', 'Neha Kapoor'),
+    ('5eed0003-0003-4000-8000-000000000093', '5eed0007-0001-4000-8000-000000000042', 'Deepa Rao'),
+    ('5eed0003-0003-4000-8000-000000000101', '5eed0007-0001-4000-8000-000000000044', 'Sana Qureshi'),
+    ('5eed0003-0003-4000-8000-000000000121', '5eed0007-0001-4000-8000-000000000027', 'Vivek Chopra'),
+    ('5eed0003-0003-4000-8000-000000000131', '5eed0007-0001-4000-8000-000000000016', 'Farhan Qureshi')
+  ) AS v(section, staff, name)
+ WHERE s.section_id::text = v.section;
 
 INSERT INTO houses (house_id, tenant_id, house_name, color_hex, created_at, updated_at, created_by, updated_by, version)
 VALUES
