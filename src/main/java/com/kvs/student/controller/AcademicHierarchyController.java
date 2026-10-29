@@ -99,6 +99,47 @@ public class AcademicHierarchyController {
     }
 
     /**
+     * Change a section's seat capacity
+     */
+    @PutMapping("/sections/{sectionId}")
+    @PreAuthorize("hasAnyRole('REGISTRAR', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<Section>> updateSection(
+            @PathVariable("sectionId") UUID sectionId,
+            @Valid @RequestBody UpdateSectionRequest request) {
+        return ResponseEntity.ok(ApiResponse.success("Section updated", academicService.updateSection(sectionId, request)));
+    }
+
+    /**
+     * Delete a section nothing refers to (409 lists what still uses it)
+     */
+    @DeleteMapping("/sections/{sectionId}")
+    @PreAuthorize("hasAnyRole('REGISTRAR', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deleteSection(@PathVariable("sectionId") UUID sectionId) {
+        academicService.deleteSection(sectionId);
+        return ResponseEntity.ok(ApiResponse.success("Section deleted", null));
+    }
+
+    /**
+     * Delete a class and its sections when none of them is used (409 lists what still uses them)
+     */
+    @DeleteMapping("/grades/{gradeId}")
+    @PreAuthorize("hasAnyRole('REGISTRAR', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deleteGrade(@PathVariable("gradeId") UUID gradeId) {
+        academicService.deleteGrade(gradeId);
+        return ResponseEntity.ok(ApiResponse.success("Class deleted", null));
+    }
+
+    /**
+     * Delete a house no student refers to
+     */
+    @DeleteMapping("/houses/{houseId}")
+    @PreAuthorize("hasAnyRole('REGISTRAR', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deleteHouse(@PathVariable("houseId") UUID houseId) {
+        academicService.deleteHouse(houseId);
+        return ResponseEntity.ok(ApiResponse.success("House deleted", null));
+    }
+
+    /**
      * Set the class teacher (form tutor) of a section
      */
     @PatchMapping("/sections/{sectionId}/class-teacher")
@@ -133,6 +174,17 @@ public class AcademicHierarchyController {
         House house = academicService.createHouse(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("House created successfully", house));
+    }
+
+    /**
+     * Rename a house or change its colour
+     */
+    @PutMapping("/houses/{houseId}")
+    @PreAuthorize("hasAnyRole('REGISTRAR', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_REGISTRAR', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<House>> updateHouse(
+            @PathVariable("houseId") UUID houseId,
+            @Valid @RequestBody UpdateHouseRequest request) {
+        return ResponseEntity.ok(ApiResponse.success("House updated", academicService.updateHouse(houseId, request)));
     }
 
     /**

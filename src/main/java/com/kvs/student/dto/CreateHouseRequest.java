@@ -16,7 +16,8 @@ public class CreateHouseRequest {
     private String tenantId;
 
     @NotBlank(message = "houseName is required")
+    @jakarta.validation.constraints.Size(max = 50, message = "houseName cannot exceed 50 characters")
     private String houseName;
-
+    @jakarta.validation.constraints.Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "colorHex must look like #1E88E5")
     private String colorHex;
 }

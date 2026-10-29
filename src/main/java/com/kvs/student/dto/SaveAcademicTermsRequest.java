@@ -30,6 +30,8 @@ public class SaveAcademicTermsRequest {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Term {
+        /** The saved term this row updates; blank for a new term */
+        private java.util.UUID termId;
 
         @NotBlank(message = "Term name is required")
         @Size(max = 50)
