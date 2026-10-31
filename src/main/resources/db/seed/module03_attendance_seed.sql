@@ -109,6 +109,19 @@ SELECT ('5eed0003-00a1-4000-8000-' || LPAD(ROW_NUMBER() OVER (ORDER BY day, sect
        'seed:attendance', 'seed:attendance', 0
 FROM (SELECT DISTINCT tenant_id, section_id, day, session FROM att_marks) r;
 
+
+-- The school's register mode (Settings → Academic setup → Attendance registers): DPS takes one register a day.
+-- The seeded marks above have AM and PM rows, so switching to AM_PM shows both sessions straight away.
+CREATE TABLE IF NOT EXISTS attendance_settings (
+    tenant_id character varying(64) NOT NULL PRIMARY KEY,
+    created_at timestamp(6) with time zone, created_by character varying(255), updated_at timestamp(6) with time zone,
+    updated_by character varying(255), version bigint,
+    register_mode character varying(10) DEFAULT 'DAILY' NOT NULL
+);
+INSERT INTO attendance_settings (tenant_id, register_mode, created_at, created_by, version)
+VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'DAILY', now(), 'seed:attendance', 0)
+ON CONFLICT (tenant_id) DO UPDATE SET register_mode = EXCLUDED.register_mode, updated_at = now(), updated_by = 'seed:attendance';
+
 COMMIT;
 
 -- Check: marks and registers per day

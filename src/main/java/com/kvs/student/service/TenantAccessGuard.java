@@ -34,6 +34,20 @@ public class TenantAccessGuard {
         return SecurityUtils.getCurrentUserRoles().contains("ROLE_SUPER_ADMIN");
     }
 
+    /**
+     * A campus check: a caller whose token names a branch may only read that branch. Super administrators and trustees (who
+     * oversee all campuses) are exempt. A token without a branch claim (issued before this check) is not limited here.
+     */
+    public void requireBranch(String branchId) {
+        if (branchId == null || isSuperAdmin() || SecurityUtils.getCurrentUserRoles().stream().anyMatch(r -> r.equals("ROLE_TRUSTEE") || r.equals("ROLE_TRUST_TREASURER"))) {
+            return;
+        }
+        boolean otherCampus = claim("branchId").map(mine -> !mine.equalsIgnoreCase(branchId)).orElse(false);
+        if (otherCampus) {
+            throw new ForbiddenException("You may only access records of your own campus");
+        }
+    }
+
     /** The caller's tenant from the bearer token, if the token carries one. */
     public Optional<String> currentTenantId() {
         return claim("tenantId");

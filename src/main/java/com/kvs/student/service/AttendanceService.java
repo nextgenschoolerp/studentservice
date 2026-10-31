@@ -23,7 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Daily student attendance: AM and PM registers per section, absence reasons, guardian follow-up of unexcused
+ * Daily student attendance: one register a day or AM and PM registers per section (the school's register mode), absence reasons, guardian follow-up of unexcused
  * absences, the school's day figure and trend, and each student's attendance to date.
  * Builds on the class roll list (US-03018): a register lists the section's active students in roll-number order.
  */
@@ -45,6 +45,46 @@ public class AttendanceService {
     @Autowired private AcademicSessionRepository sessionRepository;
     @Autowired private StudentAuditService auditService;
     @Autowired private TenantAccessGuard tenantGuard;
+    @Autowired private AttendanceSettingsRepository settingsRepository;
+
+    // ------------------------------------------------------------------ settings
+
+    /** The school's register mode; one register a day until a principal chooses morning and afternoon registers. */
+    public AttendanceRegisterMode modeOf(String tenantId) {
+        return settingsRepository.findById(tenantId).map(AttendanceSettings::getMode).orElse(AttendanceRegisterMode.DAILY);
+    }
+
+    @Transactional(readOnly = true)
+    public AttendanceSettingsResponse getSettings(String tenantId) {
+        String tenant = resolveTenant(tenantId);
+        return settingsRepository.findById(tenant).map(this::toSettings)
+                .orElse(AttendanceSettingsResponse.builder().tenantId(tenant).mode(AttendanceRegisterMode.DAILY).sessionsPerDay(1).build());
+    }
+
+    @Transactional
+    public AttendanceSettingsResponse saveSettings(String tenantId, SaveAttendanceSettingsRequest request) {
+        String tenant = resolveTenant(tenantId);
+        AttendanceSettings s = settingsRepository.findById(tenant).orElse(AttendanceSettings.builder().tenantId(tenant).build());
+        AttendanceRegisterMode before = s.getMode() != null ? s.getMode() : AttendanceRegisterMode.DAILY;
+        AttendanceRegisterMode mode;
+        try { mode = AttendanceRegisterMode.valueOf(request.getMode().trim().toUpperCase(Locale.ROOT)); }
+        catch (IllegalArgumentException e) { throw new BadRequestException("Unknown register mode " + request.getMode() + ": use DAILY (one register a day) or AM_PM (morning and afternoon registers)"); }
+        s.setMode(mode);
+        AttendanceSettings saved = settingsRepository.save(s);
+        auditService.logSuccess("tenant:" + tenant, "UPDATE_ATTENDANCE_MODE", "Attendance registers: " + before + " → " + mode);
+        return toSettings(saved);
+    }
+
+    private AttendanceSettingsResponse toSettings(AttendanceSettings s) {
+        return AttendanceSettingsResponse.builder().tenantId(s.getTenantId()).mode(s.getMode()).sessionsPerDay(s.getMode().sessionsPerDay())
+                .updatedBy(s.getUpdatedBy() != null ? s.getUpdatedBy() : s.getCreatedBy())
+                .updatedAt(s.getUpdatedAt() != null ? s.getUpdatedAt() : s.getCreatedAt()).build();
+    }
+
+    /** Marks that count in this mode: with one register a day only the day register (stored as AM). */
+    private static boolean counts(AttendanceRegisterMode mode, AttendanceSession session) {
+        return mode == AttendanceRegisterMode.AM_PM || session == AttendanceSession.AM;
+    }
 
     // ------------------------------------------------------------------ register
 
@@ -67,6 +107,16 @@ public class AttendanceService {
         if (request.getDate().isBefore(today.minusDays(TEACHER_CORRECTION_DAYS))
                 && SecurityUtils.getCurrentUserRoles().stream().noneMatch(LATE_CORRECTION_ROLES::contains)) {
             throw new ForbiddenException("Registers older than " + TEACHER_CORRECTION_DAYS + " days can only be corrected by a principal or vice principal");
+        }
+
+        AttendanceRegisterMode mode = modeOf(grade.getTenantId());
+        if (mode == AttendanceRegisterMode.DAILY) {
+            if (request.getSession() == AttendanceSession.PM) {
+                throw new BadRequestException("This school takes one register a day; there is no afternoon register. A principal can switch to morning and afternoon registers in Settings → Academic setup.");
+            }
+            request.setSession(AttendanceSession.AM);
+        } else if (request.getSession() == null) {
+            throw new BadRequestException("Session (AM or PM) is required: this school takes morning and afternoon registers");
         }
 
         Map<UUID, StudentMaster> roll = onRoll(sectionId).stream().collect(Collectors.toMap(StudentMaster::getStudentId, Function.identity()));
@@ -125,7 +175,7 @@ public class AttendanceService {
             registerRepository.save(register);
         }
         auditService.logSuccess("section:" + sectionId, register == null ? "SUBMIT_ATTENDANCE_REGISTER" : "CORRECT_ATTENDANCE_REGISTER",
-                grade.getGradeName() + "-" + section.getSectionName() + " " + request.getDate() + " " + request.getSession() + ": " + changed + " mark(s) saved");
+                grade.getGradeName() + "-" + section.getSectionName() + " " + request.getDate() + " " + (mode == AttendanceRegisterMode.DAILY ? "day register" : request.getSession()) + ": " + changed + " mark(s) saved");
         return buildRegister(grade, section, request.getDate());
     }
 
@@ -158,7 +208,9 @@ public class AttendanceService {
         LocalDate end = to != null ? to : LocalDate.now();
         LocalDate start = from != null ? from : end.minusDays(6);
         checkRange(start, end);
+        AttendanceRegisterMode mode = modeOf(tenant);
         List<StudentAttendance> rows = attendanceRepository.findByTenantIdAndStatusAndAttendanceDateBetween(tenant, AttendanceStatus.UNEXCUSED, start, end).stream()
+                .filter(a -> counts(mode, a.getSession()))
                 .filter(a -> branchId == null || branchId.equalsIgnoreCase(a.getBranchId()))
                 .filter(a -> includeResolved || a.getFollowUpStatus() != FollowUpStatus.RESOLVED)
                 .collect(Collectors.toList());
@@ -177,7 +229,9 @@ public class AttendanceService {
         if (status == AttendanceStatus.PRESENT) {
             throw new BadRequestException("Absence history lists LATE, EXCUSED and UNEXCUSED marks");
         }
+        AttendanceRegisterMode mode = modeOf(tenant);
         List<StudentAttendance> rows = attendanceRepository.findByTenantIdAndAttendanceDateBetween(tenant, start, end).stream()
+                .filter(a -> counts(mode, a.getSession()))
                 .filter(a -> a.getStatus() != AttendanceStatus.PRESENT)
                 .filter(a -> status == null || a.getStatus() == status)
                 .filter(a -> branchId == null || branchId.equalsIgnoreCase(a.getBranchId()))
@@ -202,12 +256,17 @@ public class AttendanceService {
         LocalDate end = to != null ? to : LocalDate.now();
         LocalDate start = from != null ? from : end.minusDays(13);
         checkRange(start, end);
-        // Only school days: days on which at least one AM register was submitted
-        return summarise(tenant, branchId, start, end).stream().filter(d -> d.getAmRegistersSubmitted() > 0).collect(Collectors.toList());
+        // Only school days: days on which at least one register that counts in this mode was submitted
+        return summarise(tenant, branchId, start, end).stream().filter(d -> d.getRegistersSubmitted() > 0).collect(Collectors.toList());
     }
 
-    /** One summary per day from start to end, from today's roll (students on roll now) and the AM marks. */
+    /**
+     * One summary per day from start to end, from today's roll (students on roll now). One register a day: the day marks (students).
+     * Morning and afternoon registers: both sessions (half-day sessions; a student counts twice).
+     */
     private List<AttendanceSummaryResponse> summarise(String tenant, String branchId, LocalDate start, LocalDate end) {
+        AttendanceRegisterMode mode = modeOf(tenant);
+        int perDay = mode.sessionsPerDay();
         List<StudentMaster> students = studentRepository.findByTenantId(tenant).stream()
                 .filter(s -> ON_ROLL.contains(s.getStudentStatus()))
                 .filter(s -> branchId == null || branchId.equalsIgnoreCase(s.getBranchId()))
@@ -224,22 +283,26 @@ public class AttendanceService {
         List<AttendanceSummaryResponse> days = new ArrayList<>();
         for (LocalDate d = start; !d.isAfter(end); d = d.plusDays(1)) {
             List<StudentAttendance> day = marks.getOrDefault(d, List.of());
-            List<StudentAttendance> am = day.stream().filter(a -> a.getSession() == AttendanceSession.AM).toList();
-            int present = count(am, AttendanceStatus.PRESENT) + count(am, AttendanceStatus.LATE);
+            List<StudentAttendance> taken = day.stream().filter(a -> counts(mode, a.getSession())).toList();
+            int present = count(taken, AttendanceStatus.PRESENT) + count(taken, AttendanceStatus.LATE);
             List<AttendanceRegister> regs = registers.getOrDefault(d, List.of());
             days.add(AttendanceSummaryResponse.builder()
                     .date(d)
+                    .mode(mode)
+                    .sessionsPerDay(perDay)
                     .totalStudents(students.size())
+                    .possible(students.size() * perDay)
                     .present(present)
-                    .late(count(am, AttendanceStatus.LATE))
-                    .excused(count(am, AttendanceStatus.EXCUSED))
-                    .unexcused(count(am, AttendanceStatus.UNEXCUSED))
-                    .unmarked(students.size() - am.size())
-                    .presentRate(rate(present, am.size()))
-                    .registersExpected(sections.size())
+                    .late(count(taken, AttendanceStatus.LATE))
+                    .excused(count(taken, AttendanceStatus.EXCUSED))
+                    .unexcused(count(taken, AttendanceStatus.UNEXCUSED))
+                    .unmarked(students.size() * perDay - taken.size())
+                    .presentRate(rate(present, taken.size()))
+                    .registersExpected(sections.size() * perDay)
+                    .registersSubmitted((int) regs.stream().filter(r -> counts(mode, r.getSession())).count())
                     .amRegistersSubmitted((int) regs.stream().filter(r -> r.getSession() == AttendanceSession.AM).count())
                     .pmRegistersSubmitted((int) regs.stream().filter(r -> r.getSession() == AttendanceSession.PM).count())
-                    .openFollowUps((int) day.stream().filter(a -> a.getStatus() == AttendanceStatus.UNEXCUSED && a.getFollowUpStatus() != FollowUpStatus.RESOLVED).count())
+                    .openFollowUps((int) taken.stream().filter(a -> a.getStatus() == AttendanceStatus.UNEXCUSED && a.getFollowUpStatus() != FollowUpStatus.RESOLVED).count())
                     .build());
         }
         return days;
@@ -263,7 +326,9 @@ public class AttendanceService {
         if (end == null) end = today;
         checkRange(start, end);
 
-        List<StudentAttendance> rows = attendanceRepository.findByStudentIdAndAttendanceDateBetweenOrderByAttendanceDateDescSessionDesc(studentId, start, end);
+        AttendanceRegisterMode mode = modeOf(student.getTenantId());
+        List<StudentAttendance> rows = attendanceRepository.findByStudentIdAndAttendanceDateBetweenOrderByAttendanceDateDescSessionDesc(studentId, start, end)
+                .stream().filter(a -> counts(mode, a.getSession())).toList();
         int present = count(rows, AttendanceStatus.PRESENT), late = count(rows, AttendanceStatus.LATE);
         List<StudentAttendance> todayRows = rows.stream().filter(a -> a.getAttendanceDate().equals(today)).toList();
         return StudentAttendanceSummaryResponse.builder()
@@ -271,6 +336,7 @@ public class AttendanceService {
                 .from(start)
                 .to(end)
                 .periodLabel(label)
+                .mode(mode)
                 .sessionsMarked(rows.size())
                 .present(present)
                 .late(late)
@@ -305,6 +371,7 @@ public class AttendanceService {
                 .gradeId(grade.getGradeId()).gradeName(grade.getGradeName())
                 .sectionId(section.getSectionId()).sectionName(section.getSectionName())
                 .date(day)
+                .mode(modeOf(grade.getTenantId()))
                 .am(sessionInfo(rows, AttendanceSession.AM, registers.get(AttendanceSession.AM)))
                 .pm(sessionInfo(rows, AttendanceSession.PM, registers.get(AttendanceSession.PM)))
                 .students(rows)

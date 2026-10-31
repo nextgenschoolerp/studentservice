@@ -12,7 +12,7 @@
 --     so transfer certificates can be signed off by two different people
 --   * DPS academic structure: sessions 2025-2026 / 2026-2027 (active), classes Nursery … Class 12
 --     (grade codes GRADE-NURSERY, GRADE-LKG, GRADE-UKG, GRADE-01 … GRADE-12, as admissionservice uses),
---     sections A–E of every class, houses Tagore / Raman / Shivaji / Ashoka;
+--     sections A and B of every class and C of Class 3, 6, 9 and 12 (34), houses Tagore / Raman / Shivaji / Ashoka;
 --     terms 1–3 of 2026-2027 with half-terms (Term 1: 31 Aug – 18 Dec, half-term 26–30 Oct)
 --
 -- Story coverage (DPS North unless noted):
@@ -153,13 +153,16 @@ SELECT ('5eed0003-0002-4000-8000-0000000000' || lpad(g.seq::text, 2, '0'))::uuid
 FROM (SELECT 1 AS seq, 'Nursery' AS name, 'GRADE-NURSERY' AS code UNION ALL SELECT 2, 'LKG', 'GRADE-LKG' UNION ALL SELECT 3, 'UKG', 'GRADE-UKG'
       UNION ALL SELECT n + 3, 'Class ' || n, 'GRADE-' || lpad(n::text, 2, '0') FROM generate_series(1, 12) AS n) AS g;
 
--- Section ids: 5eed0003-0003-4000-8000-0000000000GS, G = grade sequence (01-15), S = 1-5 for A-E (e.g. Class 6-A = …000000000091)
+-- Section ids: 5eed0003-0003-4000-8000-0000000000GS, G = grade sequence (01-15), S = 1-3 for A-C (e.g. Class 6-A = …000000000091)
 INSERT INTO sections (section_id, grade_id, section_name, max_capacity, created_at, updated_at, created_by, updated_by, version)
 SELECT ('5eed0003-0003-4000-8000-000000000' || lpad(g.seq::text, 2, '0') || s.idx)::uuid,
        ('5eed0003-0002-4000-8000-0000000000' || lpad(g.seq::text, 2, '0'))::uuid, s.name, CASE WHEN g.seq <= 3 THEN 30 ELSE 40 END,
        TIMESTAMPTZ '2026-02-01 05:00:00+00', TIMESTAMPTZ '2026-02-01 05:00:00+00', 'seed:module03', NULL, 0
 FROM generate_series(1, 15) AS g(seq)
-CROSS JOIN (VALUES (1, 'A'), (2, 'B'), (3, 'C'), (4, 'D'), (5, 'E')) AS s(idx, name);
+CROSS JOIN (VALUES (1, 'A'), (2, 'B'), (3, 'C')) AS s(idx, name)
+-- Sections A and B of every class, and C of Class 3, 6, 9 and 12 (they have students): 34 sections. The empty C, D and E
+-- sections were removed in Settings → Classes, sections & houses on 29 Oct 2026.
+WHERE s.idx <= 2 OR g.seq IN (6, 9, 12, 15);
 
 -- Class teachers (form tutors) of most sections that have students (5-B, 6-B, 9-C, 12-B and 12-C have none yet, for the
 -- Settings → Classes, sections & houses screen): hrservice staff ids (module 07 seed) and their names

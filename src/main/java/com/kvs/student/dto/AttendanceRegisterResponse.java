@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.kvs.student.enums.AttendanceRegisterMode;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -23,6 +25,8 @@ public class AttendanceRegisterResponse {
     private UUID sectionId;
     private String sectionName;
     private LocalDate date;
+    /** DAILY: only {@code am} is used (the day's register); AM_PM: both */
+    private AttendanceRegisterMode mode;
     private SessionInfo am;
     private SessionInfo pm;
     private List<StudentRow> students;

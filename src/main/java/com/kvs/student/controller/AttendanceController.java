@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Daily student attendance (AM and PM registers), built on the class roll list of US-03018.
+ * Daily student attendance (one register a day, or AM and PM registers, per the school's setting), built on the class roll list of US-03018.
  * School-wide lists default to the caller's tenant (the token's tenantId claim); a SUPER_ADMIN passes tenantId.
  */
 @RestController
@@ -29,8 +29,27 @@ public class AttendanceController {
     private static final String MARK = "hasAnyRole('CLASS_TEACHER', 'ACADEMIC_HEAD', 'VICE_PRINCIPAL', 'SCHOOL_PRINCIPAL', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_CLASS_TEACHER', 'ROLE_ACADEMIC_HEAD', 'ROLE_VICE_PRINCIPAL', 'ROLE_SCHOOL_PRINCIPAL', 'ROLE_SUPER_ADMIN')";
     private static final String FOLLOW_UP = "hasAnyRole('CLASS_TEACHER', 'OFFICE_CLERK', 'VICE_PRINCIPAL', 'SCHOOL_PRINCIPAL', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_CLASS_TEACHER', 'ROLE_OFFICE_CLERK', 'ROLE_VICE_PRINCIPAL', 'ROLE_SCHOOL_PRINCIPAL', 'ROLE_SUPER_ADMIN')";
 
+    /** Who may switch between one register a day and morning and afternoon registers */
+    private static final String SETTINGS = "hasAnyRole('SCHOOL_PRINCIPAL', 'PRINCIPAL', 'SUPER_ADMIN') or hasAnyAuthority('ROLE_SCHOOL_PRINCIPAL', 'ROLE_PRINCIPAL', 'ROLE_SUPER_ADMIN')";
+
     @Autowired
     private AttendanceService attendanceService;
+
+    /** The school's register mode (DAILY or AM_PM); any signed-in user of the school may read it. */
+    @GetMapping("/settings")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<AttendanceSettingsResponse>> getSettings(@RequestParam(value = "tenantId", required = false) String tenantId) {
+        return ResponseEntity.ok(ApiResponse.success(attendanceService.getSettings(tenantId)));
+    }
+
+    /** One register a day (DAILY) or morning and afternoon registers (AM_PM). Figures follow the mode at once; marks already taken are kept. */
+    @PutMapping("/settings")
+    @PreAuthorize(SETTINGS)
+    public ResponseEntity<ApiResponse<AttendanceSettingsResponse>> saveSettings(@RequestParam(value = "tenantId", required = false) String tenantId,
+                                                                               @Valid @RequestBody SaveAttendanceSettingsRequest request) {
+        log.info("Request to set attendance registers to {}", request.getMode());
+        return ResponseEntity.ok(ApiResponse.success("Attendance settings saved", attendanceService.saveSettings(tenantId, request)));
+    }
 
     /** A section's register for a day (default today): AM and PM marks of every student on roll. */
     @GetMapping("/sections/{sectionId}/register")
@@ -42,7 +61,7 @@ public class AttendanceController {
         return ResponseEntity.ok(ApiResponse.success(attendanceService.getRegister(sectionId, date)));
     }
 
-    /** Submit or correct the AM or PM register; corrections older than 7 days need a principal or vice principal. */
+    /** Submit or correct the day register (or the AM or PM register); corrections older than 7 days need a principal or vice principal. */
     @PutMapping("/sections/{sectionId}/register")
     @PreAuthorize(MARK)
     public ResponseEntity<ApiResponse<AttendanceRegisterResponse>> saveRegister(
@@ -52,7 +71,7 @@ public class AttendanceController {
         return ResponseEntity.ok(ApiResponse.success("Attendance register saved", attendanceService.saveRegister(sectionId, request)));
     }
 
-    /** The school's attendance for a day (default today) from the morning registers. */
+    /** The school's attendance for a day (default today), following the register mode. */
     @GetMapping("/summary")
     @PreAuthorize(VIEW)
     public ResponseEntity<ApiResponse<AttendanceSummaryResponse>> getSummary(

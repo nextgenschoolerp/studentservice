@@ -138,6 +138,7 @@ public class StudentService {
     @Transactional(readOnly = true)
     public List<StudentResponse> listStudents(String tenantId, String branchId) {
         tenantGuard.requireTenant(tenantId);
+        tenantGuard.requireBranch(branchId);
         return studentRepository.findByTenantIdAndBranchId(tenantId, branchId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -434,6 +435,7 @@ public class StudentService {
      */
     @Transactional(readOnly = true)
     public List<StudentResponse> filterStudents(String tenantId, String branchId, UUID gradeId, UUID sectionId, UUID houseId, String transportRouteId, StudentStatus status) {
+        tenantGuard.requireBranch(branchId);
         if (tenantId != null && !tenantId.isBlank()) {
             tenantGuard.requireTenantRecord(tenantId, "Tenant", "tenantId", tenantId);
         }
