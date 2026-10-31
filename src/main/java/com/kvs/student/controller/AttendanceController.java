@@ -4,6 +4,7 @@ import com.kvs.core.dto.ApiResponse;
 import com.kvs.student.dto.*;
 import com.kvs.student.enums.AttendanceStatus;
 import com.kvs.student.service.AttendanceService;
+import com.kvs.student.service.TenantAccessGuard;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ public class AttendanceController {
 
     @Autowired
     private AttendanceService attendanceService;
+    @Autowired
+    private TenantAccessGuard tenantGuard;
 
     /** The school's register mode (DAILY or AM_PM); any signed-in user of the school may read it. */
     @GetMapping("/settings")
@@ -78,6 +81,7 @@ public class AttendanceController {
             @RequestParam(value = "tenantId", required = false) String tenantId,
             @RequestParam(value = "branchId", required = false) String branchId,
             @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        tenantGuard.requireBranch(branchId);
         return ResponseEntity.ok(ApiResponse.success(attendanceService.getDaySummary(tenantId, branchId, date)));
     }
 
@@ -89,6 +93,7 @@ public class AttendanceController {
             @RequestParam(value = "branchId", required = false) String branchId,
             @RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        tenantGuard.requireBranch(branchId);
         return ResponseEntity.ok(ApiResponse.success(attendanceService.getTrend(tenantId, branchId, from, to)));
     }
 
@@ -103,6 +108,7 @@ public class AttendanceController {
             @RequestParam(value = "status", required = false) AttendanceStatus status,
             @RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        tenantGuard.requireBranch(branchId);
         return ResponseEntity.ok(ApiResponse.success(attendanceService.listAbsences(tenantId, branchId, gradeId, sectionId, status, from, to)));
     }
 
@@ -115,6 +121,7 @@ public class AttendanceController {
             @RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             @RequestParam(value = "includeResolved", defaultValue = "false") boolean includeResolved) {
+        tenantGuard.requireBranch(branchId);
         return ResponseEntity.ok(ApiResponse.success(attendanceService.listFollowUps(tenantId, branchId, from, to, includeResolved)));
     }
 

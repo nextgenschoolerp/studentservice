@@ -46,5 +46,9 @@ public class SaveAcademicTermsRequest {
         private LocalDate halfTermStart;
         private LocalDate halfTermEnd;
         private Boolean isCurrent;
+
+        public Term(String termName, LocalDate startDate, LocalDate endDate, LocalDate halfTermStart, LocalDate halfTermEnd, Boolean isCurrent) {
+            this(null, termName, startDate, endDate, halfTermStart, halfTermEnd, isCurrent);
+        }
     }
 }
