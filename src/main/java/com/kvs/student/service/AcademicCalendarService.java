@@ -14,6 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -50,6 +54,20 @@ public class AcademicCalendarService {
         AcademicSession session = session(academicYearId);
         if (request.getStartDate().isAfter(request.getEndDate())) {
             throw new BadRequestException("The year must start before it ends");
+        }
+        // Years of a school may not overlap, and the year's terms must still fit inside its new dates
+        for (AcademicSession other : sessionRepository.findByTenantId(session.getTenantId())) {
+            if (!other.getAcademicYearId().equals(academicYearId)
+                    && !request.getStartDate().isAfter(other.getEndDate()) && !request.getEndDate().isBefore(other.getStartDate())) {
+                throw new BadRequestException(session.getSessionName() + " would overlap " + other.getSessionName()
+                        + " (" + other.getStartDate() + " to " + other.getEndDate() + ")");
+            }
+        }
+        for (AcademicTerm t : termRepository.findByAcademicYearIdOrderBySortOrderAsc(academicYearId)) {
+            if (t.getStartDate().isBefore(request.getStartDate()) || t.getEndDate().isAfter(request.getEndDate())) {
+                throw new BadRequestException(t.getTermName() + " (" + t.getStartDate() + " to " + t.getEndDate()
+                        + ") would fall outside the year; change the term dates first");
+            }
         }
         session.setStartDate(request.getStartDate());
         session.setEndDate(request.getEndDate());
@@ -88,24 +106,33 @@ public class AcademicCalendarService {
             if (i > 0 && !t.getStartDate().isAfter(terms.get(i - 1).getEndDate())) {
                 throw new BadRequestException(t.getTermName() + " overlaps " + terms.get(i - 1).getTermName());
             }
+            if (t.getStartDate().isBefore(session.getStartDate()) || t.getEndDate().isAfter(session.getEndDate())) {
+                throw new BadRequestException(t.getTermName() + " must fall inside " + session.getSessionName()
+                        + " (" + session.getStartDate() + " to " + session.getEndDate() + ")");
+            }
         }
-        termRepository.deleteByAcademicYearId(academicYearId);
-        termRepository.flush();
+        // Update the terms in place (their ids stay the same), add new ones, and remove the ones left out
+        Map<UUID, AcademicTerm> existing = new HashMap<>();
+        termRepository.findByAcademicYearIdOrderBySortOrderAsc(academicYearId).forEach(t -> existing.put(t.getTermId(), t));
+        Set<UUID> kept = new HashSet<>();
         List<AcademicTerm> saved = new ArrayList<>();
         for (int i = 0; i < terms.size(); i++) {
             SaveAcademicTermsRequest.Term t = terms.get(i);
-            saved.add(termRepository.save(AcademicTerm.builder()
-                    .tenantId(session.getTenantId())
-                    .academicYearId(academicYearId)
-                    .termName(t.getTermName().trim())
-                    .startDate(t.getStartDate())
-                    .endDate(t.getEndDate())
-                    .halfTermStart(t.getHalfTermStart())
-                    .halfTermEnd(t.getHalfTermEnd())
-                    .isCurrent(Boolean.TRUE.equals(t.getIsCurrent()))
-                    .sortOrder(i + 1)
-                    .build()));
+            AcademicTerm row = t.getTermId() != null && existing.containsKey(t.getTermId()) ? existing.get(t.getTermId())
+                    : AcademicTerm.builder().tenantId(session.getTenantId()).academicYearId(academicYearId).build();
+            row.setTermName(t.getTermName().trim());
+            row.setStartDate(t.getStartDate());
+            row.setEndDate(t.getEndDate());
+            row.setHalfTermStart(t.getHalfTermStart());
+            row.setHalfTermEnd(t.getHalfTermEnd());
+            row.setIsCurrent(Boolean.TRUE.equals(t.getIsCurrent()));
+            row.setSortOrder(i + 1);
+            if (row.getTermId() != null) kept.add(row.getTermId());
+            saved.add(row);
         }
+        existing.values().stream().filter(t -> !kept.contains(t.getTermId())).forEach(termRepository::delete);
+        termRepository.flush();
+        saved = termRepository.saveAll(saved);
         auditService.logSuccess("session:" + academicYearId, "SAVE_TERMS", "Saved " + saved.size() + " terms for " + session.getSessionName());
         return saved;
     }

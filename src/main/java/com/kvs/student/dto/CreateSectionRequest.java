@@ -19,7 +19,9 @@ public class CreateSectionRequest {
     private UUID gradeId;
 
     @NotBlank(message = "sectionName is required")
+    @jakarta.validation.constraints.Size(max = 10, message = "sectionName cannot exceed 10 characters")
     private String sectionName;
-
+    @jakarta.validation.constraints.Min(value = 1, message = "maxCapacity must be at least 1")
+    @jakarta.validation.constraints.Max(value = 100, message = "maxCapacity cannot exceed 100")
     private Integer maxCapacity;
 }

@@ -10,6 +10,7 @@ import java.util.UUID;
 @Repository
 public interface StudentGuardianRepository extends JpaRepository<StudentGuardian, UUID> {
     List<StudentGuardian> findByStudentId(UUID studentId);
+    List<StudentGuardian> findByStudentIdIn(java.util.Collection<UUID> studentIds);
     List<StudentGuardian> findByEmail(String email);
     List<StudentGuardian> findByMobileNumber(String mobileNumber);
 }

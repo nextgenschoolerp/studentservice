@@ -30,6 +30,8 @@ public class SaveAcademicTermsRequest {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Term {
+        /** The saved term this row updates; blank for a new term */
+        private java.util.UUID termId;
 
         @NotBlank(message = "Term name is required")
         @Size(max = 50)
@@ -44,5 +46,9 @@ public class SaveAcademicTermsRequest {
         private LocalDate halfTermStart;
         private LocalDate halfTermEnd;
         private Boolean isCurrent;
+
+        public Term(String termName, LocalDate startDate, LocalDate endDate, LocalDate halfTermStart, LocalDate halfTermEnd, Boolean isCurrent) {
+            this(null, termName, startDate, endDate, halfTermStart, halfTermEnd, isCurrent);
+        }
     }
 }

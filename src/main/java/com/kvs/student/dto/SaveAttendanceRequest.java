@@ -25,7 +25,7 @@ public class SaveAttendanceRequest {
     @NotNull(message = "Date is required")
     private LocalDate date;
 
-    @NotNull(message = "Session (AM or PM) is required")
+    /** AM or PM when the school takes morning and afternoon registers; with one register a day leave it out (it is stored as AM) */
     private AttendanceSession session;
 
     @NotEmpty(message = "At least one student mark is required")

@@ -19,11 +19,14 @@ public class CreateGradeRequest {
     private String tenantId;
 
     @NotBlank(message = "gradeName is required")
+    @jakarta.validation.constraints.Size(max = 50, message = "gradeName cannot exceed 50 characters")
     private String gradeName;
 
     @NotBlank(message = "gradeCode is required")
+    @jakarta.validation.constraints.Size(max = 20, message = "gradeCode cannot exceed 20 characters")
     private String gradeCode;
 
     @NotNull(message = "sequenceOrder is required")
+    @jakarta.validation.constraints.Min(value = 1, message = "sequenceOrder must be at least 1")
     private Integer sequenceOrder;
 }

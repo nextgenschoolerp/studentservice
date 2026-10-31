@@ -69,8 +69,14 @@ class AcademicCalendarIntegrationTest {
     }
 
     private static SaveAcademicTermsRequest.Term term(String name, String start, String end, String halfStart, String halfEnd, boolean current) {
-        return new SaveAcademicTermsRequest.Term(name, LocalDate.parse(start), LocalDate.parse(end),
-                halfStart == null ? null : LocalDate.parse(halfStart), halfEnd == null ? null : LocalDate.parse(halfEnd), current);
+        return SaveAcademicTermsRequest.Term.builder()
+                .termName(name)
+                .startDate(LocalDate.parse(start))
+                .endDate(LocalDate.parse(end))
+                .halfTermStart(halfStart == null ? null : LocalDate.parse(halfStart))
+                .halfTermEnd(halfEnd == null ? null : LocalDate.parse(halfEnd))
+                .isCurrent(current)
+                .build();
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kvs.core.service.JwtTokenService;
 import com.kvs.student.dto.SaveAttendanceRequest;
+import com.kvs.student.dto.SaveAttendanceSettingsRequest;
 import com.kvs.student.dto.UpdateFollowUpRequest;
 import com.kvs.student.entity.Grade;
 import com.kvs.student.entity.Section;
@@ -50,6 +51,7 @@ class AttendanceIntegrationTest {
     @Autowired private SectionRepository sectionRepository;
     @Autowired private StudentAttendanceRepository attendanceRepository;
     @Autowired private AttendanceRegisterRepository registerRepository;
+    @Autowired private com.kvs.student.repo.AttendanceSettingsRepository settingsRepository;
 
     private Section sectionA;
     private Section sectionB;
@@ -78,6 +80,7 @@ class AttendanceIntegrationTest {
     void tearDown() {
         attendanceRepository.deleteAll();
         registerRepository.deleteAll();
+        settingsRepository.deleteAll();
         studentRepository.deleteAll();
         sectionRepository.deleteAll();
         gradeRepository.deleteAll();
@@ -317,6 +320,8 @@ class AttendanceIntegrationTest {
     @Test
     @DisplayName("GET students/{id} - attendance rate to date, today's marks and absences")
     void testStudentSummary() throws Exception {
+        mockMvc.perform(put("/api/v1/attendance/settings").header("Authorization", token("SCHOOL_PRINCIPAL")).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new SaveAttendanceSettingsRequest("AM_PM")))).andExpect(status().isOk());
         save("CLASS_TEACHER", sectionA.getSectionId(), today.minusDays(1), AttendanceSession.AM, mark(bilal, AttendanceStatus.PRESENT, null)).andExpect(status().isOk());
         save("CLASS_TEACHER", sectionA.getSectionId(), today.minusDays(1), AttendanceSession.PM, mark(bilal, AttendanceStatus.PRESENT, null)).andExpect(status().isOk());
         markMorning();
